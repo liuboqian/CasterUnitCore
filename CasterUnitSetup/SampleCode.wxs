@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="SampleFold">
+            <Component Id="cmpE6A49C5456C0D96A60132A0F404E7D75" Guid="{FD2283CA-85B5-487F-A760-680FF450C20D}">
+                <File Id="fil0DC079282D19A21C31138B1DA4F37876" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash.sln" />
+            </Component>
+            <Component Id="cmp09DB0BA847B84192F61C2C49D1132F22" Guid="{32FB0BC8-25AD-4A6E-8F7D-B14BE7A26AFA}">
+                <File Id="fil705B3CDB634BF7DD13217891D7C0357D" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash.v12.suo" />
+            </Component>
+            <Component Id="cmp101894923BD6D4A1A8ADE4A97C84CB65" Guid="{6A7C7438-DAF9-441A-B938-03CFEC9E18BF}">
+                <File Id="filD8EA604C2A9294D32D9BCBE2B93BD09E" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlashTest.bkp" />
+            </Component>
+            <Component Id="cmpF53E8A98B92FDA6F2D0272C8C08CDDB2" Guid="{29F709A3-3F16-4D43-A70C-C4C2B8B7433F}">
+                <File Id="filDAE9D1162C83FAD2D28FB3B3C8D3144A" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlashTest.fsd" />
+            </Component>
+            <Directory Id="dir687FFF6F679F7FCA18DBDC6692244B9F" Name="CasterFlash">
+                <Component Id="cmpA5D5F6E0F2C9DC5676F9FF374C142C3A" Guid="{E4B48CD6-D966-4D2E-ACDE-494A9BF951A7}">
+                    <File Id="filA476F2D80EF796F84BF5A01224874726" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\CasterFlash.cs" />
+                </Component>
+                <Component Id="cmp57EA9A8D22E15B8E77E98C7E36B8D5A5" Guid="{F8C7BA26-B0AC-472A-AB45-0DF5FAD2734D}">
+                    <File Id="fil4CB3AD9DC93A25863F2BEF1993CA258B" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\CasterFlash.csproj" />
+                </Component>
+                <Component Id="cmpEEEAC4AE0F95158F04216273BCFA8E88" Guid="{6339B4C4-89DD-4C60-985E-D02948593F22}">
+                    <File Id="fil19D8B43414F6B559B6EA95D38B39C567" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\CasterFlash.csproj.user" />
+                </Component>
+                <Component Id="cmpDFCEDABE8E8C0520BBEC9F4594433045" Guid="{D4D58227-FDDD-4697-9F59-51F151EDEB53}">
+                    <File Id="filB09490B34F2DADDCBCB1018A8AB4685B" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\FlashCalculator.cs" />
+                </Component>
+                <Component Id="cmpA61711C6B28947982FD603707F0D8FC4" Guid="{CF12112F-A889-4D30-8A41-CEB33F0C2C4F}">
+                    <File Id="fil78CCE6C2CAB9660DD89C438825CF959E" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\IFlash.cs" />
+                </Component>
+                <Directory Id="dir14B4846D8DEF8081DA9EBC687AE27C65" Name="Options">
+                    <Component Id="cmp8CDE6FC5CBF8101A3374C2B353FEE6ED" Guid="{3DDAD97A-AB8B-4BEF-9DE0-A5507E91FFB3}">
+                        <File Id="filE5768DFEA55BAD9106E8EAD774684F6C" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\Options\FlashOptions.cs" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir98EE4B192F05FB063C09EF244074B0F1" Name="Properties">
+                    <Component Id="cmp1C09B61745AA99E752F3B4AAD5727B28" Guid="{B21AB7D7-898C-4427-B31A-23F56BCCCAEF}">
+                        <File Id="filBCF03735BF67410F600E81C73008E204" KeyPath="yes" Source="$(var.CasterFlash)\CasterFlash\Properties\AssemblyInfo.cs" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="CasterFlashComponentGroup">
+            <ComponentRef Id="cmpE6A49C5456C0D96A60132A0F404E7D75" />
+            <ComponentRef Id="cmp09DB0BA847B84192F61C2C49D1132F22" />
+            <ComponentRef Id="cmp101894923BD6D4A1A8ADE4A97C84CB65" />
+            <ComponentRef Id="cmpF53E8A98B92FDA6F2D0272C8C08CDDB2" />
+            <ComponentRef Id="cmpA5D5F6E0F2C9DC5676F9FF374C142C3A" />
+            <ComponentRef Id="cmp57EA9A8D22E15B8E77E98C7E36B8D5A5" />
+            <ComponentRef Id="cmpEEEAC4AE0F95158F04216273BCFA8E88" />
+            <ComponentRef Id="cmpDFCEDABE8E8C0520BBEC9F4594433045" />
+            <ComponentRef Id="cmpA61711C6B28947982FD603707F0D8FC4" />
+            <ComponentRef Id="cmp8CDE6FC5CBF8101A3374C2B353FEE6ED" />
+            <ComponentRef Id="cmp1C09B61745AA99E752F3B4AAD5727B28" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>
