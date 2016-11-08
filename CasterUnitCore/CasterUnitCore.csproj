@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{59193795-6B7E-4149-8572-D03A525B8CD1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CasterUnitCore</RootNamespace>
+    <AssemblyName>CasterUnitCore</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DocumentationFile>bin\Debug\CasterUnitCore.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\CasterUnitCore.xml</DocumentationFile>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>CasterUnitCore.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CAPE-OPENv1-1-0, Version=1.1.0.0, Culture=neutral, PublicKeyToken=10a1040e6624c81d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\CAPE-OPENv1-1-0.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\CapeCategoryAttribute.cs" />
+    <Compile Include="Attributes\CapeHelpURLAttribute.cs" />
+    <Compile Include="Attributes\CapeAboutAttribute.cs" />
+    <Compile Include="Attributes\CapeDescriptionAttribute.cs" />
+    <Compile Include="Attributes\CapeVendorURLAttribute.cs" />
+    <Compile Include="Attributes\CapeVersionAttribute.cs" />
+    <Compile Include="Attributes\CapeNameAttribute.cs" />
+    <Compile Include="Base\CapeCollection.cs" />
+    <Compile Include="Base\CapeCollectionPair.cs" />
+    <Compile Include="Base\CapeOpenBaseObject.cs" />
+    <Compile Include="Calculate.cs" />
+    <Compile Include="CasterUnitLocator.cs" />
+    <Compile Include="CasterUnitOperationBase.cs" />
+    <Compile Include="Exceptions\ECapeErrorHResult.cs" />
+    <Compile Include="Exceptions\ECapeUnknownException.cs" />
+    <Compile Include="GUI\MainViewModel.cs" />
+    <Compile Include="GUI\ParameterModel.cs" />
+    <Compile Include="GUI\ParameterTemplateSelector.cs" />
+    <Compile Include="GUI\ParameterWindow.xaml.cs">
+      <DependentUpon>ParameterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\ViewModelLocator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persist\IPersistStream.cs" />
+    <Compile Include="Parameters\CapeArrayParameter.cs" />
+    <Compile Include="Parameters\CapeBooleanParameter.cs" />
+    <Compile Include="Parameters\CapeIntParameter.cs" />
+    <Compile Include="Parameters\CapeMatrixParameter.cs" />
+    <Compile Include="Parameters\CapeOptionParameter.cs" />
+    <Compile Include="Parameters\CapeParameterBase.cs" />
+    <Compile Include="Parameters\CapeRealParameter.cs" />
+    <Compile Include="Parameters\Units.cs" />
+    <Compile Include="Parameters\UnitCategoryEnum.cs" />
+    <Compile Include="Persist\UBinder.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="SimulationContext\CapeCOSEUtilities.cs" />
+    <Compile Include="SimulationContext\CapeMaterialTemplateSystem.cs" />
+    <Compile Include="Streams\CapeEnergyPort.cs" />
+    <Compile Include="Streams\CapeInformationPort.cs" />
+    <Compile Include="Streams\CapeMaterialPort.cs" />
+    <Compile Include="Streams\CapeUnitPort.cs" />
+    <Compile Include="Streams\MaterialObject.cs" />
+    <Compile Include="Streams\MaterialObject10.cs" />
+    <Compile Include="Streams\MaterialObject11.cs" />
+    <Compile Include="Streams\Phases.cs" />
+    <Compile Include="Streams\PropertyBasis.cs" />
+    <Compile Include="Streams\PropertyCategory.cs" />
+    <Compile Include="SimulationContext\CapeDiagnostic.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="CasterUnitCore.snk" />
+    <None Include="license.rtf" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Parameters\unitCategory.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Parameters\unit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="GUI\ParameterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="treeIcon\1.bmp" />
+    <Resource Include="treeIcon\10.bmp" />
+    <Resource Include="treeIcon\11.bmp" />
+    <Resource Include="treeIcon\12.bmp" />
+    <Resource Include="treeIcon\13.bmp" />
+    <Resource Include="treeIcon\14.bmp" />
+    <Resource Include="treeIcon\15.bmp" />
+    <Resource Include="treeIcon\16.bmp" />
+    <Resource Include="treeIcon\17.bmp" />
+    <Resource Include="treeIcon\18.bmp" />
+    <Resource Include="treeIcon\2.bmp" />
+    <Resource Include="treeIcon\3.bmp" />
+    <Resource Include="treeIcon\4.bmp" />
+    <Resource Include="treeIcon\5.bmp" />
+    <Resource Include="treeIcon\6.bmp" />
+    <Resource Include="treeIcon\7.bmp" />
+    <Resource Include="treeIcon\8.bmp" />
+    <Resource Include="treeIcon\9.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
