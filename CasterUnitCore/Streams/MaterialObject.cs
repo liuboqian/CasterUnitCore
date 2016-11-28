@@ -136,7 +136,7 @@ namespace CasterUnitCore
 
         #endregion
 
-        #region Phase List
+        #region Phase
         /// <summary>
         /// Get all allowed phase by thermo system
         /// </summary>
@@ -186,6 +186,40 @@ namespace CasterUnitCore
             }
         }
 
+        /// <summary>
+        /// Get the vapor part of current material
+        /// </summary>
+        public MaterialObject VaporMaterial
+        {
+            get
+            {
+                MaterialObject mat = this.Duplicate();
+                mat.SetOverallTPFlowCompositionAndFlash(
+                    this.T,
+                    this.P,
+                    this.TotalFlow * this.VaporFraction,
+                    this.GetSinglePhaseComposition(Phases.Vapor, PropertyBasis.Mole));
+                return mat;
+            }
+        }
+
+        /// <summary>
+        /// Get the liquid part of current material
+        /// </summary>
+        public MaterialObject LiquidMaterial
+        {
+            get
+            {
+                MaterialObject mat = this.Duplicate();
+                mat.SetOverallTPFlowCompositionAndFlash(
+                    this.T,
+                    this.P,
+                    this.TotalFlow * (1 - this.VaporFraction),
+                    this.GetSinglePhaseComposition(Phases.Liquid, PropertyBasis.Mole));
+                return mat;
+            }
+        }
+
         #endregion
 
         #region CompoundId
@@ -196,10 +230,10 @@ namespace CasterUnitCore
         {
             get { return aliasName.Length; }
         }     /// <summary>
-        /// get compound aliasName, only get once really when SetMaterial is invoked,
-        /// other time it will return the previous stored data.
-        /// If your need to get CompoundList in somewhere else than Calculate, call UpdateCompoundList first.
-        /// </summary>
+              /// get compound aliasName, only get once really when SetMaterial is invoked,
+              /// other time it will return the previous stored data.
+              /// If your need to get CompoundList in somewhere else than Calculate, call UpdateCompoundList first.
+              /// </summary>
         public string[] Compounds
         {
             get
@@ -209,8 +243,8 @@ namespace CasterUnitCore
                 return temp;
             }
         }     /// <summary>
-        /// get compound formulaName, unavailable for CO1.0
-        /// </summary>
+              /// get compound formulaName, unavailable for CO1.0
+              /// </summary>
         public abstract string[] Formulas { get; }
         /// <summary>
         /// Force to call the Thermo System, to get a new CompoundList. 
