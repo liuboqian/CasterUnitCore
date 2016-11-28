@@ -53,7 +53,7 @@ namespace CasterUnitCoreTest
 
         public override void Calculate()
         {
-            throw new ECapeUnknownException(UnitOp,"Test");
+            //throw new ECapeUnknownException(UnitOp,"Test");
 
             #region Flash
             outputMaterial.T = ParamT;
@@ -64,56 +64,56 @@ namespace CasterUnitCoreTest
             Debug.Assert(outputMaterial.DoPHFlash());
             #endregion
 
-            //#region Overall
+            #region Overall
 
-            //double Tcurr = outputMaterial.T;
-            //double Pcurr = outputMaterial.P;
-            //var composition = outputMaterial.Composition;
-            //double enthalpy = outputMaterial.Enthalpy;
-            //double volume = outputMaterial.VolumeFlow;
-            ////double gibbsEnergy = 0;
-            ////if (outputMaterial.AvailableSinglePhaseProp.Contains("gibbsEnergy"))
-            ////    gibbsEnergy = outputMaterial.GibbsEnergy;
-            ////double entropy = 0;
-            ////if (outputMaterial.AvailableSinglePhaseProp.Contains("entropy"))
-            ////    entropy = outputMaterial.Entropy;
+            double Tcurr = outputMaterial.T;
+            double Pcurr = outputMaterial.P;
+            var composition = outputMaterial.Composition;
+            double enthalpy = outputMaterial.Enthalpy;
+            double volume = outputMaterial.VolumeFlow;
+            //double gibbsEnergy = 0;
+            //if (outputMaterial.AvailableSinglePhaseProp.Contains("gibbsEnergy"))
+            //    gibbsEnergy = outputMaterial.GibbsEnergy;
+            //double entropy = 0;
+            //if (outputMaterial.AvailableSinglePhaseProp.Contains("entropy"))
+            //    entropy = outputMaterial.Entropy;
 
-            //#endregion
+            #endregion
 
-            //#region SinglePhase
+            #region SinglePhase
 
-            //var fugacity = outputMaterial.GetSinglePhasePropList("logFugacityCoefficient", Phases.Vapor, PropertyBasis.Undefined);
-            //var activity = outputMaterial.GetSinglePhasePropList("activityCoefficient", Phases.Liquid, PropertyBasis.Undefined);
+            var fugacity = outputMaterial.GetSinglePhasePropList("logFugacityCoefficient", Phases.Vapor, PropertyBasis.Undefined);
+            var activity = outputMaterial.GetSinglePhasePropList("activityCoefficient", Phases.Liquid, PropertyBasis.Undefined);
 
-            //#endregion
+            #endregion
 
-            //#region TwoPhase
+            #region TwoPhase
 
-            //outputMaterial.VaporFraction = 1;
-            //Debug.Assert(outputMaterial.DoPVFlash());  //COFE fails
-            //var kvalue = outputMaterial.KValue;
+            outputMaterial.VaporFraction = 1;
+            Debug.Assert(outputMaterial.DoPVFlash());  //COFE fails
+            var kvalue = outputMaterial.KValue;
 
-            //#endregion
+            #endregion
 
-            //#region Constant
+            #region Constant
 
-            //var R = outputMaterial.GetUniversalConstProp("molarGasConstant");
-            //var molecularWeight = outputMaterial.GetCompoundConstPropDouble("molecularWeight",
-            //    outputMaterial.Compounds[0]);
-            //var heatCapacity = outputMaterial.GetCompoundTDependentProp("heatOfVaporization",
-            //    outputMaterial.Compounds[0], ParamT);
+            var R = outputMaterial.GetUniversalConstProp("molarGasConstant");
+            var molecularWeight = outputMaterial.GetCompoundConstPropDouble("molecularWeight",
+                outputMaterial.Compounds[0]);
+            var heatCapacity = outputMaterial.GetCompoundTDependentProp("heatOfVaporization",
+                outputMaterial.Compounds[0], ParamT);
 
-            //#endregion
+            #endregion
 
-            //#region Enthalpy
+            #region Enthalpy
 
-            //double[] idealGasEnthalpy=new double[3];
-            //for (int i = 0; i < outputMaterial.CompoundNum; i++)
-            //    idealGasEnthalpy[i] = outputMaterial.GetCompoundTDependentProp("idealGasEnthalpy",
-            //        outputMaterial.Compounds[i], outputMaterial.T);
-            //double excessH=outputMaterial.GetSinglePhasePropDouble("mixtureEnthalpyDifference", Phases.Vapor, PropertyBasis.Mole);
+            double[] idealGasEnthalpy = new double[3];
+            for (int i = 0; i < outputMaterial.CompoundNum; i++)
+                idealGasEnthalpy[i] = outputMaterial.GetCompoundTDependentProp("idealGasEnthalpy",
+                    outputMaterial.Compounds[i], outputMaterial.T);
+            double excessH = outputMaterial.GetSinglePhasePropDouble("mixtureEnthalpyDifference", Phases.Vapor, PropertyBasis.Mole);
 
-            //#endregion
+            #endregion
 
             return;
         }
