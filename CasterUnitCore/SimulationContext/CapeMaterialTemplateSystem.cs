@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,11 +20,24 @@ namespace CasterUnitCore
 
         public static string[] MaterialTemplates
         {
-            get { return (_materialTemplateSystem.MaterialTemplates as IEnumerable<string>).ToArray(); }
+            get
+            {
+                if (_materialTemplateSystem == null)
+                {
+                    Debug.WriteLine("Get MaterialTemplates Failed.");
+                    return new string[0];
+                }
+                return (_materialTemplateSystem.MaterialTemplates as IEnumerable<string>).ToArray();
+            }
         }
 
         public static ICapeThermoMaterialTemplate CreateMaterialTemplate(string materialTemplateName)
         {
+            if (_materialTemplateSystem == null)
+            {
+                Debug.WriteLine("Create MaterialTemplate Failed.");
+                return null;
+            }
             return _materialTemplateSystem.CreateMaterialTemplate(materialTemplateName);
         }
     }
