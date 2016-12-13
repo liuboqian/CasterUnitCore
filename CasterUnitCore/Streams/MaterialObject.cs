@@ -378,11 +378,15 @@ namespace CasterUnitCore
         /// <summary>
         /// get K value between Vapor and Liquid phase
         /// </summary>
-        public double[] KValue
+        public Dictionary<string,double> KValue
         {
             get
             {
-                return GetTwoPhasePropList("kvalue", Phases.Vapor, Phases.Liquid, PropertyBasis.Undefined);
+                double[] Karray= GetTwoPhasePropList("kvalue", Phases.Vapor, Phases.Liquid, PropertyBasis.Undefined);
+                Dictionary<string, double> K = new Dictionary<string, double>();
+                for (int i = 0; i < CompoundNum; i++)
+                    K[Compounds[i]] = Karray[i];
+                return K;
             }
         }
         /// <summary>

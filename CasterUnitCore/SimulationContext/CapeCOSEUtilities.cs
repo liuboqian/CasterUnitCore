@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,11 +20,24 @@ namespace CasterUnitCore
 
         public static string[] NamedValueList
         {
-            get { return (_utilities.NamedValueList as IEnumerable<string>).ToArray(); }
+            get
+            {
+                if (_utilities == null)
+                {
+                    Debug.WriteLine("Get NamedValueList Failed.");
+                    return new string[0];
+                }
+                return (_utilities.NamedValueList as IEnumerable<string>).ToArray();
+            }
         }
 
         public static object NamedValue(string name)
         {
+            if (_utilities == null)
+            {
+                Debug.WriteLine("Get NamedValue Failed.");
+                return null;
+            }
             return _utilities.get_NamedValue(name);
         }
     }

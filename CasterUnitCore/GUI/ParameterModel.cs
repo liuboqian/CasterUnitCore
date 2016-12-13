@@ -60,7 +60,8 @@ namespace CasterUnitCore
                     }
                     catch (Exception)
                     {
-                        throw;
+                        CapeRealParameter realParam = Parameter as CapeRealParameter;
+                        realParam.value=double.NaN;
                     }
                 }
                 else

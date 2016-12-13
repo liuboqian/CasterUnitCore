@@ -350,6 +350,7 @@ namespace CasterUnitCore
             get { return _simulationContext; }
             set
             {
+                _simulationContext = value as ICapeSimulationContext;
                 CapeDiagnostic.SetSimulationContext(value as ICapeDiagnostic);
                 CapeMaterialTemplateSystem.SetSimulationContext(value as ICapeMaterialTemplateSystem);
                 CapeCOSEUtilities.SetSimulationContext(value as ICapeCOSEUtilities);

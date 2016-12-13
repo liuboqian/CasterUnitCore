@@ -283,7 +283,7 @@ namespace CasterUnitCore
 
         #endregion
 
-        #region Phase List
+        #region Phase
 
         public override Phases[] GetListOfAllowedPhase(out string[] phaseAggregationList, out string keyCompoundId)
         {
@@ -308,6 +308,7 @@ namespace CasterUnitCore
                                   select new Phases(phaseString)).ToArray();
             return phaseList;
         }
+
         public override Phases[] GetListOfPresentPhases(out eCapePhaseStatus[] presentPhaseStatus)
         {
             object phaseLabel = null;

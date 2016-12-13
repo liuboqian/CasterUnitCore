@@ -238,7 +238,7 @@ namespace CasterUnitCore
 
         #endregion
 
-        #region Phase List
+        #region Phase
 
         public override Phases[] GetListOfAllowedPhase(out string[] phaseAggregationList, out string keyCompoundId)
         {

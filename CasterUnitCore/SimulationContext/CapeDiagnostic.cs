@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Diagnostics;
 using CAPEOPEN;
 
 namespace CasterUnitCore
@@ -21,12 +22,18 @@ namespace CasterUnitCore
 
         public static void PopUpMessage(string msg, params object[] args)
         {
-            _diagnostic.PopUpMessage(string.Format(msg, args));
+            if (_diagnostic == null)
+                Debug.WriteLine("PopUp Failed. {0}", string.Format(msg, args));
+            else
+                _diagnostic.PopUpMessage(string.Format(msg, args));
         }
 
         public static void LogMessage(string msg, params object[] args)
         {
-            _diagnostic.LogMessage(string.Format(msg, args));
+            if (_diagnostic == null)
+                Debug.WriteLine("Log Failed. {0}", string.Format(msg, args));
+            else
+                _diagnostic.LogMessage(string.Format(msg, args));
         }
     }
 }

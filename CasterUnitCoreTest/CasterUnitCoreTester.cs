@@ -55,8 +55,8 @@ namespace CasterUnitCoreTest
             Ports = new CapeCollection("Ports", "this is the port collection of test unit.");
             Ports.Add(new CapeMaterialPort("feed", CapePortDirection.CAPE_INLET, "Inlet Material"));
             Ports.Add(new CapeMaterialPort("product", CapePortDirection.CAPE_OUTLET, "Outlet Material"));
-            Ports.Add(new CapeEnergyPort("energy", CapePortDirection.CAPE_INLET));
-            Ports.Add(new CapeInformationPort("info", CapePortDirection.CAPE_INLET));
+            //Ports.Add(new CapeEnergyPort("energy", CapePortDirection.CAPE_INLET));
+            //Ports.Add(new CapeInformationPort("info", CapePortDirection.CAPE_INLET));
         }
 
         public override void InitResults()
