@@ -191,7 +191,7 @@ namespace CasterUnitCore
             foreach (var item in Ports)
             {
                 CapeMaterialPort p = item.Value as CapeMaterialPort;
-                if (p != null)
+                if (p != null && p.Material != null)
                     p.Material.UpdateCompoundList();
             }
         }
@@ -206,7 +206,7 @@ namespace CasterUnitCore
         {
             UpdateCompoundList();
             SpecCalculator.BeforeCalculate();
-            CapeDiagnostic.LogMessage("{0} : Calculate Start.",ComponentName);
+            CapeDiagnostic.LogMessage("{0} : Calculate Start.", ComponentName);
             SpecCalculator.Calculate();
             CapeDiagnostic.LogMessage("{0} : Calculate Complete.", ComponentName);
             SpecCalculator.OutputResult();

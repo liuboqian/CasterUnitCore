@@ -64,6 +64,20 @@ namespace CasterUnitCore
                         realParam.value=double.NaN;
                     }
                 }
+                else if (ParamType == CapeParamType.CAPE_INT)
+                {
+                    try
+                    {
+                        CapeIntParameter intParam = Parameter as CapeIntParameter;
+                        intParam.value = Convert.ToInt32(value);
+                    }
+                    catch (Exception)
+                    {
+                        CapeIntParameter intParam = Parameter as CapeIntParameter;
+                        intParam.value = default(int);
+                    }
+
+                }
                 else
                     Parameter.value = value;
             }
@@ -84,7 +98,7 @@ namespace CasterUnitCore
                     realParam.value = Units.UnitConvert(Units.GetSIUnit(realParam.CurrentUnitCategory),
                                         Convert.ToDouble(realParam.value), CurrentUnit, realParam.CurrentUnitCategory);
                 else     //if parameter is input, the display value won't change, otherwise, the display value change
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CurrentValue));
             }
         }            //当前单位，默认SI
         /// <summary>

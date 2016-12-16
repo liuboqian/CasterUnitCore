@@ -89,7 +89,7 @@ namespace CasterUnitCore
         public ICapeIdentification this[string key]
         {
             get { return this._items[key]; }
-            set { this._items[key] = value; }           
+            set { this._items[key] = value; }
         }
 
         /// <summary>
