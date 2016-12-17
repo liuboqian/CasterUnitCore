@@ -187,36 +187,46 @@ namespace CasterUnitCore
         }
 
         /// <summary>
-        /// Get the vapor part of current material
+        /// Get the vapor part of current material, if this material is totally liquid, will return null
         /// </summary>
         public MaterialObject VaporMaterial
         {
             get
             {
                 MaterialObject mat = this.Duplicate();
-                mat.SetOverallTPFlowCompositionAndFlash(
-                    this.T,
-                    this.P,
-                    this.TotalFlow * this.VaporFraction,
-                    this.GetSinglePhaseComposition(Phases.Vapor, PropertyBasis.Mole));
-                return mat;
+                if (mat.VaporFraction != 0)
+                {
+                    mat.SetOverallTPFlowCompositionAndFlash(
+                        this.T,
+                        this.P,
+                        this.TotalFlow*this.VaporFraction,
+                        this.GetSinglePhaseComposition(Phases.Vapor, PropertyBasis.Mole));
+                    return mat;
+                }
+                else
+                    return null;
             }
         }
 
         /// <summary>
-        /// Get the liquid part of current material
+        /// Get the liquid part of current material, if this material is totally vapor, will return null
         /// </summary>
         public MaterialObject LiquidMaterial
         {
             get
             {
                 MaterialObject mat = this.Duplicate();
-                mat.SetOverallTPFlowCompositionAndFlash(
-                    this.T,
-                    this.P,
-                    this.TotalFlow * (1 - this.VaporFraction),
-                    this.GetSinglePhaseComposition(Phases.Liquid, PropertyBasis.Mole));
-                return mat;
+                if (VaporFraction < 1)
+                {
+                    mat.SetOverallTPFlowCompositionAndFlash(
+                        this.T,
+                        this.P,
+                        this.TotalFlow * (1 - this.VaporFraction),
+                        this.GetSinglePhaseComposition(Phases.Liquid, PropertyBasis.Mole));
+                    return mat;
+                }
+                else
+                    return null;
             }
         }
 
@@ -378,11 +388,11 @@ namespace CasterUnitCore
         /// <summary>
         /// get K value between Vapor and Liquid phase
         /// </summary>
-        public Dictionary<string,double> KValue
+        public Dictionary<string, double> KValue
         {
             get
             {
-                double[] Karray= GetTwoPhasePropList("kvalue", Phases.Vapor, Phases.Liquid, PropertyBasis.Undefined);
+                double[] Karray = GetTwoPhasePropList("kvalue", Phases.Vapor, Phases.Liquid, PropertyBasis.Undefined);
                 Dictionary<string, double> K = new Dictionary<string, double>();
                 for (int i = 0; i < CompoundNum; i++)
                     K[Compounds[i]] = Karray[i];
