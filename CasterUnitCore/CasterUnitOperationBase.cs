@@ -244,8 +244,7 @@ namespace CasterUnitCore
         {
             get
             {
-                if (OnGetPorts != null)
-                    OnGetPorts(Ports);
+                OnGetPorts?.Invoke(Ports);
                 return Ports;
             }
         }
@@ -270,7 +269,7 @@ namespace CasterUnitCore
 
             CasterUnitLocator.Register(unitId, this);
 
-            if (OnInitialize != null) OnInitialize();
+            OnInitialize?.Invoke();
 
             Debug.WriteLine("Initialize Done.");
         }
@@ -281,7 +280,7 @@ namespace CasterUnitCore
         public virtual void Terminate()
         {
             Debug.WriteLine("Terminate");
-            if (OnTerminate != null) OnTerminate();
+            OnTerminate?.Invoke();
 
             if (simulationContext != null && simulationContext.GetType().IsCOMObject)
                 Marshal.FinalReleaseComObject(simulationContext);
@@ -337,8 +336,7 @@ namespace CasterUnitCore
         {
             get
             {
-                if (OnGetParameters != null)
-                    OnGetParameters(Parameters);
+                OnGetParameters?.Invoke(Parameters);
                 return Parameters;
             }
         }
@@ -467,20 +465,39 @@ namespace CasterUnitCore
                 this.ComponentName = objArray[0].ToString();
                 this.ComponentDescription = objArray[1].ToString();
 
-                Parameters.Clear();
+                //Parameters.Clear();
+                //If the parameters have changed, the new or diffent parameter will not be replaced
                 foreach (var pair in objArray[2] as CapeCollectionPair[])
                 {
-                    Parameters.Add(pair);
+                    //Parameters.Add(pair);
+                    try
+                    {
+                        ((CapeParameterBase)Parameters[pair.Key]).value = ((CapeParameterBase)pair.Value).value;
+                    }
+                    catch
+                    { }
                 }
-                Results.Clear();
+                //Results.Clear();
                 foreach (var pair in objArray[3] as CapeCollectionPair[])
                 {
-                    Results.Add(pair);
+                    //Results.Add(pair);
+                    try
+                    {
+                        ((CapeParameterBase)Results[pair.Key]).value = ((CapeParameterBase)pair.Value).value;
+                    }
+                    catch
+                    { }
                 }
-                Ports.Clear();
+                //Ports.Clear();
                 foreach (var pair in objArray[4] as CapeCollectionPair[])
                 {
-                    Ports.Add(pair);
+                    //Ports.Add(pair);
+                    try
+                    {
+                        ((CapeParameterBase)Ports[pair.Key]).value = ((CapeParameterBase)pair.Value).value;
+                    }
+                    catch
+                    { }
                 }
             }
             catch (Exception ex)

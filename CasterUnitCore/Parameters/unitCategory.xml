@@ -63,7 +63,7 @@
   <Category_Spec>
     <Category>Temperature</Category>
     <Aspen>TEMPERATURE</Aspen>
-    <SI_Unit>K</SI_Unit>
+    <SI_Unit>C</SI_Unit>
     <Mass>0</Mass>
     <Time>0</Time>
     <Length>0</Length>
@@ -272,7 +272,7 @@
   <Category_Spec>
     <Category>Pressure</Category>
     <Aspen>PRESSURE</Aspen>
-    <SI_Unit>Pa</SI_Unit>
+    <SI_Unit>kPa</SI_Unit>
     <Mass>1</Mass>
     <Time>-2</Time>
     <Length>-1</Length>
