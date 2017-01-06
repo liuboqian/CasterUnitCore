@@ -50,7 +50,7 @@
             <File Id="programfileXML" LongName="CasterUnitCore.XML" Source="$(var.CasterUnitCoreDebug)CasterUnitCore.XML"/>
             <!--<Registry Id="register" Root="HKLM" Key="SOFTWAREMicrosoft.NETFrameworkAssemblyFolders[CasterUnitCore]" Value="[$ProductComponent]" Type="string"/>-->
             <File Id="license" Source="$(var.CasterUnitCore)license.rtf"/>
-            <File Id="help" Source="$(var.CasterUnitCore)Build Your Own CapeOpen Unit In 15 Minutes.docx"/>
+            <File Id="help" Source="$(var.CasterUnitCore)/Guide/Build Your Own CapeOpen Unit In 15 Minutes.docx"/>
             <File Id="COPIA" Source="$(var.CasterUnitCore)packages/CAPE-OPENv1-1-0.dll"/>
           </Component>
 

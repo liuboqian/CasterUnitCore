@@ -36,6 +36,7 @@ namespace CasterUnitCore
         #endregion
 
         #region Constructor
+   
         /// <summary>
         /// create a MaterialObject10
         /// </summary>
@@ -43,6 +44,7 @@ namespace CasterUnitCore
             : this(null)
         {
         }
+      
         /// <summary>
         /// create a MaterialObject10 connected to object, should only be invoked by CapeUnitPortBase
         /// </summary>

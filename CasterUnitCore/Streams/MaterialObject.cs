@@ -31,20 +31,24 @@ namespace CasterUnitCore
         /// get material object version, can be 11 or 10
         /// </summary>
         public int MaterialObjectVersion;
+    
         /// <summary>
         /// whether the material has been flashed
         /// </summary>
         //protected bool _alreadyFlashed;
+   
         /// <summary>
         /// A string array used to make CompoundList property faster, avoid calling Thermo System, contains the aliasName of compound
         /// </summary>
         protected string[] aliasName;
 
         #region Material Object Manipulate
+     
         /// <summary>
         /// return COM raw interface
         /// </summary>
         public abstract object CapeThermoMaterialObject { get; }
+   
         /// <summary>
         /// Clear all property in material, set to initial state
         /// </summary>
@@ -57,21 +61,25 @@ namespace CasterUnitCore
         {
             Dispose();
         }
+   
         /// <summary>
         /// Duplicate this material, it is the only way to create a new material object
         /// </summary>
         /// <returns>return MaterialObject10 or MaterialObject11</returns>
         public abstract MaterialObject Duplicate();
+   
         /// <summary>
         /// Whether the COM material object is connected to this class
         /// </summary>
         public abstract bool IsValid();
+  
         /// <summary>
         /// Set material object raw COM interface or MaterialObject to this class
         /// </summary>
         /// <paramCollection name="material">raw COM interface like ICapeThermoMaterial</paramCollection>
         /// <returns></returns>
         public abstract bool SetMaterial(object material);
+  
         /// <summary>
         /// Set MaterialObject to this class
         /// </summary>
@@ -81,6 +89,7 @@ namespace CasterUnitCore
         {
             return SetMaterial((object)material);
         }
+  
         /// <summary>
         /// Release resources, do nothing for now
         /// </summary>
@@ -89,10 +98,12 @@ namespace CasterUnitCore
         #endregion
 
         #region DoFlash
+    
         /// <summary>
         /// Check if the specified condition is available by thermo system, CO1.0 will always return true
         /// </summary>
         protected abstract bool CheckEquilibriumSpec(string[] flashSpec1, string[] flashSpec2, string solutionType);
+     
         /// <summary>
         /// Do Flash by flashSpec, in most case you don't need this, will check the spec first
         /// </summary>
@@ -108,26 +119,31 @@ namespace CasterUnitCore
         /// <paramCollection name="solutionType"></paramCollection>
         /// <returns>calculate state</returns>
         public abstract bool DoFlash(string[] flashSpec1, string[] flashSpec2, string solutionType, bool showWarning = false);
+       
         /// <summary>
         /// Temperature-Pressure flash, must set overall T,P,TotalFlow,Composition first, if fails, show message on Debug
         /// </summary>
         /// <paramCollection name="showWarning">whether show a MessageBox to warn flash failure</paramCollection>
         public abstract bool DoTPFlash(bool showWarning = false);
+       
         /// <summary>
         /// Pressure-Enthalpy flash, must set overall P,H,TotalFlow,Composition first, if fails, show message on Debug
         /// </summary>
         /// <paramCollection name="showWarning">whether show a MessageBox to warn flash failure</paramCollection>
         public abstract bool DoPHFlash(bool showWarning = false);
+     
         /// <summary>
         /// Temperature-Enthalpy flash, must set overall T,H,TotalFlow,Composition first, if fails, show message on Debug
         /// </summary>
         /// <paramCollection name="showWarning">whether show a MessageBox to warn flash failure</paramCollection>
         public abstract bool DoTHFlash(bool showWarning = false);
+     
         /// <summary>
         /// Temperature-VaporFraction flash, must set overall T,VaporFraction,TotalFlow,Composition first, if fails, show message on Debug
         /// </summary>
         /// <paramCollection name="showWarning">whether show a MessageBox to warn flash failure</paramCollection>
         public abstract bool DoTVFFlash(bool showWarning = false);
+     
         /// <summary>
         /// Pressure-VaporFraction flash, must set overall P,VaporFraction,TotalFlow,Composition first, if fails, show message on Debug
         /// </summary>
@@ -137,22 +153,26 @@ namespace CasterUnitCore
         #endregion
 
         #region Phase
+     
         /// <summary>
         /// Get all allowed phase by thermo system
         /// </summary>
         /// <paramCollection name="phaseAggregationList">null for CO1.0</paramCollection>
         /// <paramCollection name="keyCompoundId">null for CO1.0</paramCollection>
         public abstract Phases[] GetListOfAllowedPhase(out string[] phaseAggregationList, out string keyCompoundId);
+      
         /// <summary>
         /// Get present phases, not alway reliable, sometimes may have some 0 flow phase
         /// 获取当前存在的相态，未必可靠（有时会有多出来的相）
         /// </summary>
         /// <paramCollection name="presentPhaseStatus">the state of phase, null for CO1.0</paramCollection>
         public abstract Phases[] GetListOfPresentPhases(out eCapePhaseStatus[] presentPhaseStatus);
+       
         /// <summary>
         /// set present phase, unavailable for CO1.0
         /// </summary>
         public abstract void SetListOfPresentPhases(IEnumerable<Phases> presentPhases, IEnumerable<eCapePhaseStatus> presentPhasesStatus);
+      
         /// <summary>
         /// get or set PresentPhases, setter is unavailable for CO1.0
         /// </summary>
@@ -173,6 +193,7 @@ namespace CasterUnitCore
                 SetListOfPresentPhases(value, status);
             }
         }
+     
         /// <summary>
         /// get alloed phases, always used to get actual phase name in diffent software
         /// </summary>
@@ -199,7 +220,7 @@ namespace CasterUnitCore
                     mat.SetOverallTPFlowCompositionAndFlash(
                         this.T,
                         this.P,
-                        this.TotalFlow*this.VaporFraction,
+                        this.TotalFlow * this.VaporFraction,
                         this.GetSinglePhaseComposition(Phases.Vapor, PropertyBasis.Mole));
                     return mat;
                 }
@@ -233,17 +254,20 @@ namespace CasterUnitCore
         #endregion
 
         #region CompoundId
+    
         /// <summary>
         /// get number of compound, will return the previous stored data
         /// </summary>
         public int CompoundNum
         {
             get { return aliasName.Length; }
-        }     /// <summary>
-              /// get compound aliasName, only get once really when SetMaterial is invoked,
-              /// other time it will return the previous stored data.
-              /// If your need to get CompoundList in somewhere else than Calculate, call UpdateCompoundList first.
-              /// </summary>
+        }
+
+        /// <summary>
+        /// get compound aliasName, only get once really when SetMaterial is invoked,
+        /// other time it will return the previous stored data.
+        /// If your need to get CompoundList in somewhere else than Calculate, call UpdateCompoundList first.
+        /// </summary>
         public string[] Compounds
         {
             get
@@ -252,10 +276,13 @@ namespace CasterUnitCore
                 aliasName.CopyTo(temp, 0);
                 return temp;
             }
-        }     /// <summary>
-              /// get compound formulaName, unavailable for CO1.0
-              /// </summary>
+        }
+
+        /// <summary>
+        /// get compound formulaName, unavailable for CO1.0
+        /// </summary>
         public abstract string[] Formulas { get; }
+
         /// <summary>
         /// Force to call the Thermo System, to get a new CompoundList. 
         /// If your need to get CompoundList in somewhere else than Calculate, call this method first.
@@ -263,9 +290,26 @@ namespace CasterUnitCore
         /// <returns></returns>
         public abstract string[] UpdateCompoundList();
 
+        /// <summary>
+        /// Return the count of compounds which flow is not zero
+        /// </summary>
+        public int ExistingCompoundCount
+        {
+            get { return Compounds.Count(c => Composition[c] != 0); }
+        }
+
+        /// <summary>
+        /// Return compounds which flow is not zero
+        /// </summary>
+        public string[] ExistingCompounds
+        {
+            get { return Compounds.Where(c => Composition[c] != 0).ToArray(); }
+        }
+
         #endregion
 
         #region Overall Property
+
         /// <summary>
         /// get overall property, return a double number, if not present, return 0; if result is an array, throw an exception
         /// </summary>
@@ -273,10 +317,12 @@ namespace CasterUnitCore
         {
             return GetOverallPropList(propName, basis).SingleOrDefault();
         }
+
         /// <summary>
         /// get overall property, return a double array, if result is a single number, will return a single element array
         /// </summary>
         public abstract double[] GetOverallPropList(string propName, PropertyBasis basis);
+
         /// <summary>
         /// set overall property
         /// </summary>
@@ -284,28 +330,34 @@ namespace CasterUnitCore
         {
             SetOverallPropList(propName, basis, new[] { value });
         }
+
         /// <summary>
         /// set overall property
         /// </summary>
         /// <paramCollection name="value">the value to be set, MUST be IEnumerable double, if you want to set other data structure, use the raw interface</paramCollection>
         public abstract void SetOverallPropList(string propName, PropertyBasis basis, IEnumerable<double> value);
+
         /// <summary>
         /// overall temperature
         /// </summary>
         public abstract double T { get; set; }
+
         /// <summary>
         /// overall pressure
         /// </summary>
         public abstract double P { get; set; }
+
         /// <summary>
         /// overall totalflow, mole basis
         /// </summary>
         public abstract double TotalFlow { get; set; }
+
         /// <summary>
         /// Overall composition, mole basis
         /// If you set a partial composition with some compounds is not in the dict, the method will take them as 0.
         /// </summary>
         public abstract Dictionary<string, double> Composition { get; set; }
+
         /// <summary>
         /// overall composition, mole basis
         /// </summary>
@@ -329,10 +381,12 @@ namespace CasterUnitCore
                 Composition = flow;
             }
         }
+
         /// <summary>
         /// fraction of vapor phase, mole basis
         /// </summary>
         public abstract double VaporFraction { get; set; }
+
         /// <summary>
         /// overall enthalpy, unit is J/s
         /// </summary>
@@ -349,6 +403,7 @@ namespace CasterUnitCore
                 SetOverallPropDouble("enthalpy", PropertyBasis.Mole, value / TotalFlow);
             }
         }
+
         /// <summary>
         /// overall entropy, unit is J/s
         /// </summary>
@@ -361,6 +416,7 @@ namespace CasterUnitCore
                     * GetSinglePhaseFlow(phase, PropertyBasis.Mole));
             }
         }
+
         /// <summary>
         /// total volume, unit is m3/s
         /// </summary>
@@ -373,6 +429,7 @@ namespace CasterUnitCore
                     / GetSinglePhasePropDouble("density", phase, PropertyBasis.Mole));
             }
         }
+
         /// <summary>
         /// overall gibbs free energy, unit is J/s
         /// </summary>
@@ -385,6 +442,7 @@ namespace CasterUnitCore
                     * GetSinglePhaseFlow(phase, PropertyBasis.Mole));
             }
         }
+
         /// <summary>
         /// get K value between Vapor and Liquid phase
         /// </summary>
@@ -399,6 +457,7 @@ namespace CasterUnitCore
                 return K;
             }
         }
+
         /// <summary>
         /// get overall T,P,totalFlow,Composition
         /// </summary>
@@ -411,6 +470,7 @@ namespace CasterUnitCore
             composition = this.Composition;
             return true;
         }
+
         /// <summary>
         /// set overall T,P,totalFlow,Composition, and do a TP flash
         /// </summary>
@@ -428,19 +488,23 @@ namespace CasterUnitCore
         #endregion
 
         #region Single Phase Property
+
         /// <summary>
         /// get all available single phase property, for CO1.0 return all property
         /// </summary>
         public abstract string[] AvailableSinglePhaseProp { get; }
+
         /// <summary>
         /// get single phase property, return a double array, will try to calculate property first, if phase is not present, return new double[CompoundNum], all 0
         /// </summary>
         public abstract double[] GetSinglePhasePropList(string propName, Phases phase, PropertyBasis basis, bool calculate = true);
+
         /// <summary>
         /// set single phase property
         /// </summary>
         /// <paramCollection name="value">the value to be set, MUST be IEnumerable double, if you want to set other data structure, use the raw interface</paramCollection>
         public abstract void SetSinglePhasePropList(string propName, Phases phase, PropertyBasis basis, IEnumerable<double> value);
+        
         /// <summary>
         /// get single phase property, return a double number, will try to calculate property first, if not present, return 0; if property is an array, throw exception
         /// </summary>
@@ -449,6 +513,7 @@ namespace CasterUnitCore
             if (PresentPhases.All(p => p.Value != phase.Value)) return 0;
             return GetSinglePhasePropList(propName, phase, basis, calculate).SingleOrDefault();
         }
+   
         /// <summary>
         /// set single pahse property
         /// </summary>
@@ -456,6 +521,7 @@ namespace CasterUnitCore
         {
             SetSinglePhasePropList(propName, phase, basis, new[] { value });
         }
+    
         /// <summary>
         /// get single phase flow
         /// </summary>
@@ -463,6 +529,7 @@ namespace CasterUnitCore
         {
             return GetSinglePhasePropDouble("phaseFraction", phase, basis, false) * TotalFlow;
         }
+     
         /// <summary>
         /// get the vapor or liquid part composition of the material, must be flashed first!
         /// </summary>
@@ -479,6 +546,7 @@ namespace CasterUnitCore
             return composition;
 
         }
+     
         /// <summary>
         /// set single phase composition, eg.set V or L in RadFrac
         /// </summary>
@@ -491,6 +559,7 @@ namespace CasterUnitCore
             }
             SetSinglePhaseComposition(phase, PropertyBasis.Mole, temp);
         }
+     
         /// <summary>
         /// Set composition of single phase, the composition is ordered by Compounds
         /// </summary>
@@ -503,19 +572,23 @@ namespace CasterUnitCore
         #endregion
 
         #region Two Phase Property
+  
         /// <summary>
         /// get all available two phase property, for CO1.0 return all property
         /// </summary>
         public abstract string[] AvailableTwoPhaseProp { get; }
+      
         /// <summary>
         /// Get two phase property, if a phase is not present, will return new double[CompoundNum]
         /// </summary>
         public abstract double[] GetTwoPhasePropList(string propName, Phases phase1, Phases phase2, PropertyBasis basis, bool calculate = true);
+    
         /// <summary>
         /// set two phase property, 
         /// </summary>
         /// <paramCollection name="value">the value to be set, MUST be IEnumerable double, if you want to set other data structure, use the raw interface</paramCollection>
         public abstract void SetTwoPhasePropList(string propName, Phases phase1, Phases phase2, PropertyBasis basis, IEnumerable<double> value);
+   
         /// <summary>
         /// get two phase property, return a double number, will try to calculate property first, if not present, return 0; if property is an array, throw exception
         /// </summary>
@@ -526,6 +599,7 @@ namespace CasterUnitCore
                 return 0;
             return GetTwoPhasePropList(propName, phase1, phase2, basis, calculate).SingleOrDefault();
         }
+    
         /// <summary>
         /// set two phase property
         /// </summary>
@@ -537,40 +611,49 @@ namespace CasterUnitCore
         #endregion
 
         #region Constant Property & T-Dependent Property & P-Dependent Property & Universal Constant
+     
         /// <summary>
         /// get all available constant property, unavailable for CO1.0 
         /// </summary>
         public abstract string[] AvailableConstProp { get; }
+      
         /// <summary>
         /// get all available T-Dependent constant property, unavailable for CO1.0 
         /// </summary>
         public abstract string[] AvailableTDependentProp { get; }
+      
         /// <summary>
         /// get all available P-Dependent constant property, unavailable for CO1.0 
         /// </summary>
         public abstract string[] AvailablePDependentProp { get; }
+      
         /// <summary>
         /// get all available universal constant property, unavailable for CO1.0 
         /// </summary>
         public abstract string[] AvailableUniversalConstProp { get; }
+      
         /// <summary>
         /// get constant property, return a double number, if not present, return 0; if property is an array, throw exception
         /// </summary>
         public abstract double GetCompoundConstPropDouble(string propName, string compoundId);
+     
         /// <summary>
         /// get T-Dependent property, unavailable for CO1.0, return a double number, if not present, return 0; if property is an array, throw exception
         /// </summary>
         public abstract double GetCompoundTDependentProp(string propName, string compoundId, double T);
+    
         /// <summary>
         /// get P-Dependent property, unavailable for CO1.0, return a double number, if not present, return 0; if property is an array, throw exception
         /// </summary>
         public abstract double GetCompoundPDependentProp(string propName, string compoundId, double P);
+     
         /// <summary>
         /// get universal constant property, return a double number, if not present, return 0; if property is an array, throw exception
         /// </summary>
         /// <paramCollection name="constantId"></paramCollection>
         /// <returns></returns>
         public abstract double GetUniversalConstProp(string constantId);
+     
         /// <summary>
         /// get constant property for all Compounds
         /// </summary>

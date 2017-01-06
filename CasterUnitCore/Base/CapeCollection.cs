@@ -45,8 +45,8 @@ namespace CasterUnitCore
         /// <summary>
         /// IsReadOnly is default set to false
         /// </summary>
-        public CapeCollection( string name = null, string description = null,bool canRename = false)
-            : base( name, description,canRename)
+        public CapeCollection(string name = null, string description = null, bool canRename = false)
+            : base(name, description, canRename)
         {
             IsReadOnly = false;
         }
@@ -60,11 +60,11 @@ namespace CasterUnitCore
             try
             {
                 if (id is string)
-                    return this[(string) id];
+                    return this[(string)id];
                 else if (id is int)
-                    return this[(int) id];
+                    return this[(int)id - 1];
                 else
-                    throw new ECapeUnknownException(this,"index can only be int or string");
+                    throw new ECapeUnknownException(this, "index can only be int or string");
             }
             catch (Exception e)
             {
@@ -79,8 +79,8 @@ namespace CasterUnitCore
         /// <paramCollection name="index">Start from one!!! int, not long</paramCollection>
         public ICapeIdentification this[int index]
         {
-            get { return this._items[_keys[index - 1]]; }
-            set { this._items[_keys[index-1]] = value; }
+            get { return this._items[_keys[index]]; }
+            set { this._items[_keys[index]] = value; }
         }
 
         /// <summary>
@@ -145,9 +145,9 @@ namespace CasterUnitCore
         public void Add(string key, ICapeIdentification item)
         {
             if (_items.ContainsValue(item))
-                throw new ECapeUnknownException(this,"This Collection already has the same item.");
+                throw new ECapeUnknownException(this, "This Collection already has the same item.");
             if (_items.ContainsKey(key))
-                throw new ECapeUnknownException(this,"This collection already has an item with the same key.");
+                throw new ECapeUnknownException(this, "This collection already has an item with the same key.");
             _keys.Add(key);
             _items.Add(key, item);
         }
@@ -241,12 +241,12 @@ namespace CasterUnitCore
         /// </summary>
         public override object Clone()
         {
-            CapeCollection newCollection = new CapeCollection( this.ComponentName,
-                this.ComponentDescription,this.CanRename);
+            CapeCollection newCollection = new CapeCollection(this.ComponentName,
+                this.ComponentDescription, this.CanRename);
             foreach (var key in _keys)
             {
                 newCollection._keys.Add(key);
-                newCollection._items.Add(key,(ICapeIdentification)((CapeOpenBaseObject)this._items[key]).Clone());
+                newCollection._items.Add(key, (ICapeIdentification)((CapeOpenBaseObject)this._items[key]).Clone());
             }
             return newCollection;
         }
