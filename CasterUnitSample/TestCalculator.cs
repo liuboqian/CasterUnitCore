@@ -22,7 +22,7 @@ using System.Windows.Forms;
 using CasterUnitCore;
 using CAPEOPEN;
 
-namespace CasterUnitCoreTest
+namespace CasterUnitSample
 {
     public class TestCalculator : Calculator
     {

@@ -17,22 +17,22 @@ using System.Runtime.InteropServices;
 using CasterUnitCore;
 using CAPEOPEN;
 
-namespace CasterUnitCoreTest
+namespace CasterUnitSample
 {
     [Serializable]
     [ComVisible(true)]
     [Guid("7CF9589B-19D6-4B1F-B259-0E0413A88968")]
-    [CapeName("CasterUnitCoreTester")]
+    [CapeName("CasterUnitSample")]
     [CapeDescription("This unit is a test to the CasterUnitCore.")]
     [CapeAbout("Caster")]
     [CapeHelpURL("liuboqian2015@outlook.com")]
     [CapeVendorURL("")]
     [CapeVersion("1.1")]
     [ComDefaultInterface(typeof(ICapeUnit))]
-    public class CasterUnitCoreTester:CasterUnitOperationBase,ICapeUnit
+    public class CasterUnitSample:CasterUnitOperationBase,ICapeUnit
     {
-        public CasterUnitCoreTester()
-            : base(new TestCalculator(), "CasterUnitCoreTester", "This unit is a test to the CasterUnitCore.")
+        public CasterUnitSample()
+            : base(new TestCalculator(), "CasterUnitSample", "This unit is a test to the CasterUnitCore.")
         { }
 
         public override void InitParameters()
