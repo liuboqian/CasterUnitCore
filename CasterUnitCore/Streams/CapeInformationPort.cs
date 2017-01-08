@@ -38,7 +38,7 @@ namespace CasterUnitCore
         /// <summary>
         /// Create a energy port, contains a ICapeCollection
         /// </summary>
-        public CapeInformationPort(string name, CapePortDirection portDirection, string description = null, bool canRename = false)
+        public CapeInformationPort(string name, CapePortDirection portDirection, string description = "", bool canRename = false)
             : base(name, CapePortType.CAPE_INFORMATION, portDirection, description, canRename)
         { }
 

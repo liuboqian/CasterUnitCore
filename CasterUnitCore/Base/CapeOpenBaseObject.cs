@@ -40,13 +40,14 @@ namespace CasterUnitCore
         /// 
         /// </summary>
         protected CapeOpenBaseObject()
-            : this("COComponent", null, true)
+            : this("COComponent", "", true)
         {// must have a non-paramCollection constructor to compatible with COM
+            _description = "";
         }
         /// <summary>
         /// 
         /// </summary>
-        protected CapeOpenBaseObject(string name = "COComponent", string description = null, bool canRename = true)
+        protected CapeOpenBaseObject(string name = "COComponent", string description = "", bool canRename = true)
         {
             _name = name;
             _description = description;
@@ -96,7 +97,7 @@ namespace CasterUnitCore
         /// </summary>
         public virtual object Clone()
         {
-            throw new NotImplementedException();
+            throw new ECapeUnknownException(this,new NotImplementedException(),typeof(ICloneable).ToString());
         }
 
         #endregion

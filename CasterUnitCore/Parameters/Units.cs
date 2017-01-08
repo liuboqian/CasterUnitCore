@@ -39,6 +39,8 @@ namespace CasterUnitCore
             XmlDocument unitDoc = new XmlDocument();
             Assembly assembly = Assembly.GetAssembly(typeof(Units));
             Stream s = assembly.GetManifestResourceStream("CasterUnitCore.Parameters.unit.xml");
+            if (s == null)
+                throw new Exception("unit.xml not found.");
             unitDoc.Load(s);
             unitNodeList = unitDoc.SelectNodes("Units/CurrentUnit_Specs");
             //load unitCategory
@@ -53,14 +55,17 @@ namespace CasterUnitCore
         public static List<string> GetUnitList(UnitCategoryEnum unitCategory)
         {
             return (from XmlNode node in unitNodeList
-                    where node.SelectSingleNode("Category").InnerText == unitCategory.ToString()
-                    select node.SelectSingleNode("CurrentUnit").InnerText).ToList();
+                    where node.SelectSingleNode("Category")?.InnerText == unitCategory.ToString()
+                    select node.SelectSingleNode("CurrentUnit")?.InnerText).ToList();
         }
         /// <summary>
         /// Convert from origin unit to destination unit
         /// </summary>
-        public static double UnitConvert(string destinationUnit, double value, string originUnit, UnitCategoryEnum unitCategory)
+        public static double UnitConvert(string destinationUnit, double value, string originUnit, UnitCategoryEnum unitCategory = UnitCategoryEnum.Empty)
         {
+            if (unitCategory == UnitCategoryEnum.Empty)
+                unitCategory = SearchUnitCategoryByUnitName(destinationUnit);
+
             double destinationConvTimes = 0;
             double destinationConvPlus = 0;
             double originConvTimes = 0;
@@ -69,36 +74,47 @@ namespace CasterUnitCore
             string originUnitType = null;
             foreach (XmlNode node in unitNodeList)
             {
-                if (destinationUnit == node.SelectSingleNode("CurrentUnit").InnerText && node.SelectSingleNode("Category").InnerText == unitCategory.ToString())
+                if (destinationUnit == node.SelectSingleNode("CurrentUnit")?.InnerText
+                    && node.SelectSingleNode("Category")?.InnerText == unitCategory.ToString())
                 {
-                    destinationConvTimes = Convert.ToDouble(node.SelectSingleNode("ConversionTimes").InnerText);
-                    destinationConvPlus = Convert.ToDouble(node.SelectSingleNode("ConversionPlus").InnerText);
-                    destUnitType = node.SelectSingleNode("Category").InnerText;
+                    destinationConvTimes = Convert.ToDouble(node.SelectSingleNode("ConversionTimes")?.InnerText);
+                    destinationConvPlus = Convert.ToDouble(node.SelectSingleNode("ConversionPlus")?.InnerText);
+                    destUnitType = node.SelectSingleNode("Category")?.InnerText;
                 }
-                if (originUnit == node.SelectSingleNode("CurrentUnit").InnerText && node.SelectSingleNode("Category").InnerText == unitCategory.ToString())
+                if (originUnit == node.SelectSingleNode("CurrentUnit")?.InnerText
+                    && node.SelectSingleNode("Category")?.InnerText == unitCategory.ToString())
                 {
-                    originConvTimes = Convert.ToDouble(node.SelectSingleNode("ConversionTimes").InnerText);
-                    originConvPlus = Convert.ToDouble(node.SelectSingleNode("ConversionPlus").InnerText);
-                    originUnitType = node.SelectSingleNode("Category").InnerText;
+                    originConvTimes = Convert.ToDouble(node.SelectSingleNode("ConversionTimes")?.InnerText);
+                    originConvPlus = Convert.ToDouble(node.SelectSingleNode("ConversionPlus")?.InnerText);
+                    originUnitType = node.SelectSingleNode("Category")?.InnerText;
                 }
             }
-            if (destUnitType != originUnitType) return Double.NaN;
+            if (destUnitType != originUnitType)
+                throw new ECapeUnknownException(
+                    $"\"{destinationUnit}\" and \"{originUnit}\" is not in a same category.");
             return (value * originConvTimes + originConvPlus) / destinationConvTimes - destinationConvPlus;
         }
+
         /// <summary>
         /// Convert a value from its origin unit to SI unit
         /// </summary>
-        public static double ConvertToSI(double value, string originUnit, UnitCategoryEnum unitCategory)
+        public static double ConvertToSI(double value, string originUnit, UnitCategoryEnum unitCategory = UnitCategoryEnum.Empty)
         {
+            if (unitCategory == UnitCategoryEnum.Empty)
+                unitCategory = SearchUnitCategoryByUnitName(originUnit);
             return UnitConvert(GetSIUnit(unitCategory), value, originUnit, unitCategory);
         }
+
         /// <summary>
         /// Convert a value from its SI unit to destination unit
         /// </summary>
-        public static double ConvertFromSI(string destinationUnit, double value, UnitCategoryEnum unitCategory)
+        public static double ConvertFromSI(string destinationUnit, double value, UnitCategoryEnum unitCategory = UnitCategoryEnum.Empty)
         {
+            if (unitCategory == UnitCategoryEnum.Empty)
+                unitCategory = SearchUnitCategoryByUnitName(destinationUnit);
             return UnitConvert(destinationUnit, value, GetSIUnit(unitCategory), unitCategory);
         }
+
         /// <summary>
         /// Get SI unit
         /// </summary>
@@ -106,11 +122,12 @@ namespace CasterUnitCore
         {
             foreach (XmlNode node in unitCategoryList)
             {
-                if (unitCategory.ToString() == node.SelectSingleNode("Category").InnerText)
-                    return node.SelectSingleNode("SI_Unit").InnerText;
+                if (unitCategory.ToString() == node.SelectSingleNode("Category")?.InnerText)
+                    return node.SelectSingleNode("SI_Unit")?.InnerText;
             }
             return null;
         }
+
         /// <summary>
         /// Get physical dimensionality, contains 8 number, represent in order Length|Mass|Time|ElectricalCurrent|Temperature|AmountOfSubstance|Luminous|Currency
         /// </summary>
@@ -119,23 +136,23 @@ namespace CasterUnitCore
             double[] dimension = new double[8];
             foreach (XmlNode node in unitCategoryList)
             {
-                if (unitCategory.ToString() == node.SelectSingleNode("Category").InnerText)
+                if (unitCategory.ToString() == node.SelectSingleNode("Category")?.InnerText)
                 {
-                    dimension[0] = Convert.ToDouble(node.SelectSingleNode("Length").InnerText);
-                    dimension[1] = Convert.ToDouble(node.SelectSingleNode("Mass").InnerText);
-                    dimension[2] = Convert.ToDouble(node.SelectSingleNode("Time").InnerText);
-                    dimension[3] = Convert.ToDouble(node.SelectSingleNode("ElectricalCurrent").InnerText);
-                    dimension[4] = Convert.ToDouble(node.SelectSingleNode("Temperature").InnerText);
-                    dimension[5] = Convert.ToDouble(node.SelectSingleNode("AmountOfSubstance").InnerText);
-                    dimension[6] = Convert.ToDouble(node.SelectSingleNode("Luminous").InnerText);
-                    dimension[7] = Convert.ToDouble(node.SelectSingleNode("Currency").InnerText);
+                    dimension[0] = Convert.ToDouble(node.SelectSingleNode("Length")?.InnerText);
+                    dimension[1] = Convert.ToDouble(node.SelectSingleNode("Mass")?.InnerText);
+                    dimension[2] = Convert.ToDouble(node.SelectSingleNode("Time")?.InnerText);
+                    dimension[3] = Convert.ToDouble(node.SelectSingleNode("ElectricalCurrent")?.InnerText);
+                    dimension[4] = Convert.ToDouble(node.SelectSingleNode("Temperature")?.InnerText);
+                    dimension[5] = Convert.ToDouble(node.SelectSingleNode("AmountOfSubstance")?.InnerText);
+                    dimension[6] = Convert.ToDouble(node.SelectSingleNode("Luminous")?.InnerText);
+                    dimension[7] = Convert.ToDouble(node.SelectSingleNode("Currency")?.InnerText);
                     return dimension;
                 }
             }
             return null;
         }
         /// <summary>
-        /// Get a unit category through name, not practical for now
+        /// Get a unit category through variable name, not practical for now
         /// </summary>
         public static UnitCategoryEnum GetUnitCategory(string categoryName)
         {
@@ -154,6 +171,44 @@ namespace CasterUnitCore
                     return UnitCategoryEnum.Power;
             }
             return UnitCategoryEnum.Dimensionless;
+        }
+
+        /// <summary>
+        /// Search a unit category by a unit name.
+        /// If not present, will throw a cape exception, if has multiple matches, will choose the one with a shorter category name
+        /// </summary>
+        /// <param name="unitName">a unit name, like "kPa"</param>
+        /// <returns>found category</returns>
+        public static UnitCategoryEnum SearchUnitCategoryByUnitName(string unitName)
+        {
+            bool exist = false;
+            string categoryName = UnitCategoryEnum.Empty.ToString();
+
+            foreach (XmlNode node in unitNodeList)
+            {
+                string curName = node.SelectSingleNode("CurrentUnit")?.InnerText;
+                if (unitName == curName)
+                {
+                    string newcategoryName = node.SelectSingleNode("Category").InnerText;
+
+                    if (!exist || newcategoryName.Length < categoryName.Length)
+                    {
+                        exist = true;
+                        categoryName = newcategoryName;
+                    }
+                }
+            }
+
+            UnitCategoryEnum res;
+
+            if (!Enum.TryParse(categoryName, out res))
+                throw new ECapeUnknownException(
+                    $"Unknown category \"{categoryName}\" for unit \"{unitName}\"");
+
+            if (res == UnitCategoryEnum.Empty)
+                throw new ECapeUnknownException(
+                    $"None Match for unit \"{unitName}\"");
+            return res;
         }
     }
 }

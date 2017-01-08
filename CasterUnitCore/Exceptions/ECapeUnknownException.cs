@@ -67,6 +67,7 @@ namespace CasterUnitCore
         /// throw an error, will create an empty CapeCollection to throw this exception
         /// </summary>
         public ECapeUnknownException(string message = null)
+            :base(message)
         {
             _errorObject = new CapeCollection(name:"ErrorObj");
             this.HResult = (int)ECapeErrorHResult.ECapeUnknownHR;

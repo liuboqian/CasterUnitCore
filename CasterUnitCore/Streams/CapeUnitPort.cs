@@ -34,7 +34,7 @@ namespace CasterUnitCore
         /// <summary>
         /// default name is "capeUnitPort"
         /// </summary>
-        protected CapeUnitPort(string name, CapePortType type, CapePortDirection portDirection, string description = null, bool canRename = false)
+        protected CapeUnitPort(string name, CapePortType type, CapePortDirection portDirection, string description = "", bool canRename = false)
             : base(name, description, canRename)
         {
             _portDirection = portDirection;
@@ -66,8 +66,6 @@ namespace CasterUnitCore
         /// Whether the port is filled with something
         /// </summary>
         public abstract bool IsConnected();
-
-        public abstract object Clone();
 
     }
 }

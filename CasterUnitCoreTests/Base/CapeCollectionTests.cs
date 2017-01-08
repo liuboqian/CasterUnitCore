@@ -13,6 +13,7 @@ namespace CasterUnitCore.Tests
     public class CapeCollectionTests
     {
         private static CapeCollection collection;
+        private static CapeRealParameter realParam;
 
         [ClassInitialize]
         public static void CapeCollectionTest(TestContext context)
@@ -21,8 +22,14 @@ namespace CasterUnitCore.Tests
 
             Assert.AreEqual(collection.ComponentName, "collection");
             Assert.AreEqual(collection.ComponentDescription, "a collection used to test");
+        }
 
-            collection.Add(new CapeRealParameter("real", UnitCategoryEnum.Area, CapeParamMode.CAPE_INPUT));
+        [TestInitialize]
+        public void AddDefaultItem()
+        {
+            collection.Clear();
+            realParam = new CapeRealParameter("real", UnitCategoryEnum.Area, CapeParamMode.CAPE_INPUT);
+            collection.Add(realParam);
             collection.Add(new CapeMaterialPort("material", CapePortDirection.CAPE_INLET));
         }
 
@@ -53,79 +60,109 @@ namespace CasterUnitCore.Tests
         public void AddTest()
         {
             collection.Add(new CapeIntParameter("int", CapeParamMode.CAPE_INPUT));
-            Assert.AreEqual( "int",collection[2].ComponentName);
+            Assert.AreEqual("int", collection[2].ComponentName);
         }
 
         [TestMethod()]
         public void AddTest1()
         {
-            Assert.Fail();
+            collection.Add("int2", new CapeIntParameter("int", CapeParamMode.CAPE_INPUT));
+            Assert.AreEqual("int", collection["int2"].ComponentName);
         }
 
         [TestMethod()]
+        [ExpectedException(typeof(ECapeUnknownException))]
         public void AddTest2()
         {
-            Assert.Fail();
+            collection.Add(new CapeCollectionPair("int3", new CapeIntParameter("int", CapeParamMode.CAPE_INPUT)));
+            Assert.AreEqual("int", collection["int3"].ComponentName);
+            var item = collection["int2"];
         }
 
         [TestMethod()]
+        [ExpectedException(typeof(ECapeUnknownException))]
         public void ClearTest()
         {
-            Assert.Fail();
+            collection.Clear();
+            Assert.AreEqual(0, collection.Count);
+            var item = collection[0];
         }
 
         [TestMethod()]
         public void ContainsTest()
         {
-            Assert.Fail();
+            Assert.AreEqual(true, collection.Contains("real"));
+            Assert.AreEqual(false, collection.Contains("real2"));
         }
 
         [TestMethod()]
         public void ContainsTest1()
         {
-            Assert.Fail();
+            Assert.AreEqual(true, collection.Contains(realParam));
+            Assert.AreEqual(false, collection.Contains((CapeRealParameter)null));
         }
 
         [TestMethod()]
         public void ContainsTest2()
         {
-            Assert.Fail();
+            ;
         }
 
         [TestMethod()]
         public void CopyToTest()
         {
-            Assert.Fail();
+            CapeCollectionPair[] array = new CapeCollectionPair[5];
+            collection.CopyTo(array, 1);
+            Assert.AreEqual(null, array[0].Key);
+            Assert.AreEqual("real", array[1].Value.ComponentName);
+            Assert.AreEqual("material", array[2].Value.ComponentName);
+            Assert.AreEqual(null, array[3].Key);
         }
 
         [TestMethod()]
         public void RemoveTest()
         {
-            Assert.Fail();
+            CapeCollectionPair p = new CapeCollectionPair("real", realParam);
+            collection.Remove(p);
+            Assert.AreEqual(1, collection.Count);
+            Assert.AreEqual("material", collection[0].ComponentName);
         }
 
         [TestMethod()]
         public void RemoveTest1()
         {
-            Assert.Fail();
+            collection.Remove(realParam);
+            Assert.AreEqual(1, collection.Count);
+            Assert.AreEqual("material", collection[0].ComponentName);
         }
 
         [TestMethod()]
         public void RemoveTest2()
         {
-            Assert.Fail();
+            collection.Remove("real");
+            Assert.AreEqual(1, collection.Count);
+            Assert.AreEqual("material", collection[0].ComponentName);
         }
 
         [TestMethod()]
         public void GetValueArrayTest()
         {
-            Assert.Fail();
+            ICapeIdentification[] obj=collection.GetValueArray();
+            Assert.AreEqual("real", obj[0].ComponentName);
+            Assert.AreEqual("material", obj[1].ComponentName);
+            Assert.AreEqual(2, obj.Length);
         }
 
         [TestMethod()]
         public void CloneTest()
         {
-            Assert.Fail();
+            CapeCollection newCollection = collection.Clone() as CapeCollection;
+
+            collection[0].ComponentDescription = "second";
+            Assert.AreEqual("", newCollection[0].ComponentDescription);
+            collection.Remove("real");
+            Assert.AreEqual("real", newCollection[0].ComponentName);
+
         }
     }
 }

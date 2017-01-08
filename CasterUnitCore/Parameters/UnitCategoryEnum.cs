@@ -18,7 +18,8 @@ using System;
 namespace CasterUnitCore
 {
     /// <summary>
-    /// Enumeration of unit categories
+    /// Enumeration of unit categories. 
+    /// Empty is not a real category, but a replacement of null, no unit should belongs to this category.
     /// </summary>
     [Serializable]
     public enum UnitCategoryEnum
@@ -31,6 +32,6 @@ namespace CasterUnitCore
         Accelerate, SpecificVolume, MolarDensity, MolarVolume,
         m3PerK, InverseLength, MolarWeight, Voltage, InverseTime,
         Energy, Power, HeatTransferCoefficient, Charge, MolarFlowRateDensity,
-        MolarPlateDensity, Dimensionless, Angle
+        MolarPlateDensity, Dimensionless, Angle, Empty
     }
 }

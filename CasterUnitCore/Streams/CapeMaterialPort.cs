@@ -37,7 +37,7 @@ namespace CasterUnitCore
         /// <summary>
         /// Create CapeMaterialPort
         /// </summary>
-        public CapeMaterialPort(string name, CapePortDirection portDirection, string description = null, bool canRename = false)
+        public CapeMaterialPort(string name, CapePortDirection portDirection, string description = "", bool canRename = false)
             : base(name, CapePortType.CAPE_MATERIAL, portDirection, description, canRename)
         { }
 

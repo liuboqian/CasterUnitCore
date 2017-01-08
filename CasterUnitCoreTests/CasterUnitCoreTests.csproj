@@ -40,6 +40,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\packages\CAPE-OPENv1-1-0.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -56,6 +57,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Base\CapeCollectionTests.cs" />
+    <Compile Include="Parameters\CapeBooleanParameterTests.cs" />
+    <Compile Include="Parameters\CapeIntParameterTests.cs" />
+    <Compile Include="Parameters\CapeOptionParameterTests.cs" />
+    <Compile Include="Parameters\CapeRealParameterTests.cs" />
+    <Compile Include="Parameters\UnitsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

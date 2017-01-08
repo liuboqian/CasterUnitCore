@@ -41,7 +41,7 @@ namespace CasterUnitCore
         /// 
         /// </summary>
         protected CapeParameterBase(string name, CapeParamType type, CapeParamMode mode, UnitCategoryEnum unitCategory)
-            : base(name, null, false)
+            : base(name, "", false)
         {
             ValStatus = CapeValidationStatus.CAPE_NOT_VALIDATED;
             //value = null;
@@ -91,11 +91,6 @@ namespace CasterUnitCore
         /// </summary>
         public object Dimensionality { get; protected set; }
         #endregion
-
-        #region ICloneable
-
-        public abstract override object Clone();
-
-        #endregion
+        
     }
 }

@@ -33,11 +33,13 @@ namespace CasterUnitCore
     public class CapeRealParameter : CapeParameterBase,
         ICapeRealParameterSpec, IComparable<double>, IComparable<ICapeRealParameterSpec>
     {
-        double _dblvalue;        //当前值
+        private double _dblvalue;        //Current value
+
         /// <summary>
         /// represent unit category, like temperature
         /// </summary>
         public UnitCategoryEnum CurrentUnitCategory;
+
         /// <summary>
         /// In default GUI, when unit is changed and mode is CAPE_INPUT, the value of parameter will change
         /// if you dont want the actual value changes with unit, use CAPE_INPUT_OUTPUT to avoid actual value change
@@ -45,12 +47,15 @@ namespace CasterUnitCore
         public string CurrentUnit { get; set; }
 
         #region Constructor
+
         /// <summary>
         /// default name is "realParameter"
         /// </summary>
         public CapeRealParameter()
-            : this("realParameter", UnitCategoryEnum.Dimensionless, CapeParamMode.CAPE_INPUT_OUTPUT)
+            : this("realParameter", UnitCategoryEnum.Dimensionless,
+                  CapeParamMode.CAPE_INPUT_OUTPUT)
         { }
+
         /// <summary>
         /// real parameter
         /// </summary>
@@ -68,6 +73,7 @@ namespace CasterUnitCore
             CurrentUnitCategory = unitCategory;
             CurrentUnit = Units.GetSIUnit(unitCategory);
         }
+
         #endregion
 
         #region ICapeParameter
@@ -84,19 +90,24 @@ namespace CasterUnitCore
             set
             {
                 double v;
-                if (value is double || value is string)
+                try
                 {
-                    v = Convert.ToDouble(value);   //应该会自动抛异常
+                    if (value is ICapeRealParameterSpec)
+                    {
+                        v = (double)((ICapeParameter)value).value;
+                    }
+                    else
+                    {
+                        v = Convert.ToDouble(value); //Should throw a exception
+                    }
                 }
-                else if (value is ICapeRealParameterSpec)
+                catch (Exception e)
                 {
-                    v = (double)((ICapeParameter)value).value;
+                    throw new ECapeUnknownException(this,
+                        "value is not double or string or ICapeRealParameterSpec");
                 }
-                else
-                {
-                    throw new ECapeUnknownException(this,"value is not double or string or ICapeRealParameterSpec");
-                }
-                if (v == _dblvalue) return;     //相同则不变
+
+                if (v == _dblvalue) return;
                 _dblvalue = v;
                 Dirty = true;
             }
@@ -121,20 +132,6 @@ namespace CasterUnitCore
             Dirty = true;
         }
 
-        public override bool Validate(ref string message)
-        {
-            bool isAvailable;
-            if (this.Type == CapeParamType.CAPE_REAL)
-                isAvailable = Validate(this._dblvalue, ref message);
-            else
-                isAvailable = false;  //未知参数类型当然不能用
-
-            if (isAvailable)
-                ValStatus = CapeValidationStatus.CAPE_VALID;
-            else
-                ValStatus = CapeValidationStatus.CAPE_INVALID;
-            return isAvailable;
-        }
         /// <summary>
         /// whether the value is a number and inside range
         /// </summary>
@@ -144,21 +141,37 @@ namespace CasterUnitCore
             return Validate(ref message);
         }
 
+        public override bool Validate(ref string message)
+        {
+            bool isAvailable;
+            isAvailable = Validate(this._dblvalue, ref message);
+
+            if (isAvailable)
+                ValStatus = CapeValidationStatus.CAPE_VALID;
+            else
+                ValStatus = CapeValidationStatus.CAPE_INVALID;
+            return isAvailable;
+        }
+
         #endregion
 
         #region ICapeRealParameterSpec
+
         /// <summary>
         /// default value
         /// </summary>
         public double DefaultValue { get; set; }
+
         /// <summary>
         /// lower boundary
         /// </summary>
         public double LowerBound { get; set; }
+
         /// <summary>
         /// upper boundary
         /// </summary>
         public double UpperBound { get; set; }
+
         /// <summary>
         /// whether the value is a number and inside range
         /// </summary>
@@ -170,12 +183,12 @@ namespace CasterUnitCore
                 message = "value is NaN";
                 isAvailable = false;
             }
-            else if (double.IsInfinity(this._dblvalue))
+            else if (double.IsInfinity(value))
             {
                 message = "value is Infinity";
                 isAvailable = false;
             }
-            else if (this._dblvalue > this.UpperBound || this._dblvalue < this.LowerBound)
+            else if (value > this.UpperBound || value < this.LowerBound)
             {
                 message = "value is out of range";
                 isAvailable = false;
@@ -187,6 +200,7 @@ namespace CasterUnitCore
             }
             return isAvailable;
         }
+
         #endregion
 
         #region IComparable
@@ -200,51 +214,40 @@ namespace CasterUnitCore
         {
             return _dblvalue.CompareTo((double)((ICapeParameter)other).value);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator ==(CapeRealParameter thisParameter, ICapeRealParameterSpec other)
         {
             return (object)thisParameter != null && thisParameter.CompareTo(other) == 0;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator !=(CapeRealParameter thisParameter, ICapeRealParameterSpec other)
         {
             return !(thisParameter == other);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator ==(CapeRealParameter thisParameter, double other)
         {
             return (object)thisParameter != null && thisParameter.CompareTo(other) == 0;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator !=(CapeRealParameter thisParameter, double other)
         {
             return !(thisParameter == other);
         }
 
+        /// <summary>
+        /// Compare a real parameter with a double or an other real parameter
+        /// </summary>
+        /// <param name="obj">If obj is double, return wether the value is equal, otherwise compare their reference</param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj is double || obj is ICapeRealParameterSpec)
-                return obj == this;
+            if (obj is double)
+                return (double)obj == this.value;
+
+            else if (obj is ICapeRealParameterSpec)
+                //return ((ICapeParameter)obj).value == this.value;
+                return this == obj;
             else
                 return false;
         }
@@ -259,11 +262,11 @@ namespace CasterUnitCore
         /// <summary>
         /// can convert to double
         /// </summary>
-        /// <paramCollection name="realParameter"></paramCollection>
-        /// <returns></returns>
-        public static implicit operator double(CapeRealParameter realParameter)
-        {
-            return realParameter.value;
-        }
+        //public static implicit operator double(CapeRealParameter realParameter)
+        //{
+        //    return realParameter.value;
+        //}
+        //Comment this method to clarify the usage, it should be used as a class, not a double
+
     }
 }

@@ -27,7 +27,7 @@ namespace CasterUnitCore
     [ComDefaultInterface(typeof(ICapeParameter))]
     public class CapeIntParameter
         : CapeParameterBase, ICapeIntegerParameterSpec,
-        IComparable<Int32>, IComparable<ICapeIntegerParameterSpec>
+          IComparable<int>, IComparable<ICapeIntegerParameterSpec>
     {
         private int _intvalue;
 
@@ -55,18 +55,17 @@ namespace CasterUnitCore
         #endregion
 
         #region CapeParameterBase
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="message"></paramCollection>
-        /// <returns></returns>
+
+        public override bool Validate()
+        {
+            string message = "";
+            return Validate(ref message);
+        }
+
         public override bool Validate(ref string message)
         {
             bool isAvailable;
-            if (Type == CapeParamType.CAPE_INT)
-                isAvailable = Validate(_intvalue, ref message);
-            else
-                isAvailable = false;
+            isAvailable = Validate(_intvalue, ref message);
 
             if (isAvailable)
                 ValStatus = CapeValidationStatus.CAPE_VALID;
@@ -74,15 +73,7 @@ namespace CasterUnitCore
                 ValStatus = CapeValidationStatus.CAPE_INVALID;
             return isAvailable;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override bool Validate()
-        {
-            string message = "";
-            return Validate(ref message);
-        }
+
         /// <summary>
         /// set to default value
         /// </summary>
@@ -101,18 +92,23 @@ namespace CasterUnitCore
             set
             {
                 int v;
-                if (value is int || value is string)
+                try
                 {
-                    v = Convert.ToInt32(value);
+                    if (value is ICapeIntegerParameterSpec)
+                    {
+                        v = (int)((ICapeParameter)value).value;
+                    }
+                    else
+                    {
+                        v = Convert.ToInt32(value);
+                    }
                 }
-                else if (value is ICapeIntegerParameterSpec)
+                catch (Exception e)
                 {
-                    v = (int)((ICapeParameter)value).value;
+                    throw new ECapeUnknownException(this,
+                        "value is not int or string or ICapeIntegerParameterSpec");
                 }
-                else
-                {
-                    throw new COMException("value is not int or string or ICapeIntegerParameterSpec");
-                }
+
                 if (v == _intvalue) return;
                 _intvalue = v;
                 Dirty = true;
@@ -142,8 +138,8 @@ namespace CasterUnitCore
         public bool Validate(int value, ref string message)
         {
             bool isAvailable;
-            if (_intvalue > UpperBound ||
-                _intvalue < LowerBound)
+            if (value > UpperBound ||
+                value < LowerBound)
             {
                 message = "value is out of range";
                 isAvailable = false;
@@ -198,7 +194,7 @@ namespace CasterUnitCore
         /// <returns></returns>
         public static bool operator !=(CapeIntParameter thisParameter, ICapeIntegerParameterSpec other)
         {
-            return !(thisParameter == other);
+            return !(thisParameter.value == (other as ICapeParameter).value);
         }
         /// <summary>
         /// 
@@ -208,7 +204,7 @@ namespace CasterUnitCore
         /// <returns></returns>
         public static bool operator ==(CapeIntParameter thisParameter, int other)
         {
-            return (object)thisParameter != null && thisParameter.CompareTo(other) == 0;
+            return (object)thisParameter.value != null && thisParameter.CompareTo(other) == 0;
         }
         /// <summary>
         /// 
@@ -218,13 +214,16 @@ namespace CasterUnitCore
         /// <returns></returns>
         public static bool operator !=(CapeIntParameter thisParameter, int other)
         {
-            return !(thisParameter == other);
+            return !(thisParameter.value == other);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is double || obj is ICapeIntegerParameterSpec)
-                return obj == this;
+            if (obj is int)
+                return (int)obj == this.value;
+            else if (obj is ICapeIntegerParameterSpec)
+                //return ((ICapeParameter)obj).value == this.value;
+                return this == obj;
             return false;
         }
 
@@ -240,9 +239,10 @@ namespace CasterUnitCore
         /// </summary>
         /// <paramCollection name="intParameter"></paramCollection>
         /// <returns></returns>
-        public static implicit operator int(CapeIntParameter intParameter)
-        {
-            return intParameter.value;
-        }
+        //public static implicit operator int(CapeIntParameter intParameter)
+        //{
+        //    return intParameter.value;
+        //}
+        //Comment this method to clarify the usage, it should be used as a class, not a double
     }
 }

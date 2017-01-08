@@ -28,7 +28,7 @@ namespace CasterUnitCore
     [ComDefaultInterface(typeof(ICapeParameter))]
     public class CapeBooleanParameter
         : CapeParameterBase, ICapeBooleanParameterSpec,
-        IComparable<bool>, IComparable<ICapeBooleanParameterSpec>
+          IComparable<bool>, IComparable<ICapeBooleanParameterSpec>
     {
         private bool _boolvalue;
 
@@ -54,20 +54,20 @@ namespace CasterUnitCore
         /// <summary>
         /// bool paramCollection is always valid
         /// </summary>
-        public override bool Validate(ref string message)
-        {
-            ValStatus = CapeValidationStatus.CAPE_VALID;
-            message = "";
-            return true;
-        }
-        /// <summary>
-        /// bool paramCollection is always valid
-        /// </summary>
         /// <returns></returns>
         public override bool Validate()
         {
             string message = "";
             return Validate(ref message);
+        }
+        /// <summary>
+        /// bool paramCollection is always valid
+        /// </summary>
+        public override bool Validate(ref string message)
+        {
+            ValStatus = CapeValidationStatus.CAPE_VALID;
+            message = "";
+            return true;
         }
         /// <summary>
         /// reset to the default value, and status set to CAPE_NOT_VALIDATED
@@ -87,18 +87,23 @@ namespace CasterUnitCore
             set
             {
                 bool v;
-                if (value is bool || value is string)
+                try
                 {
-                    v = Convert.ToBoolean(value);
+                    if (value is ICapeBooleanParameterSpec)
+                    {
+                        v = (bool)((ICapeParameter)value).value;
+                    }
+                    else
+                    {
+                        v = Convert.ToBoolean(value);
+                    }
                 }
-                else if (value is ICapeBooleanParameterSpec)
+                catch (Exception e)
                 {
-                    v = (bool)((ICapeParameter)value).value;
+                    throw new ECapeUnknownException(this,
+                        "value is not bool or string or ICapeBooleanParameterSpec");
                 }
-                else
-                {
-                    throw new COMException("value is not bool or string or ICapeBooleanParameterSpec");
-                }
+                
                 if (v == _boolvalue) return;
                 _boolvalue = v;
                 Dirty = true;
@@ -124,7 +129,7 @@ namespace CasterUnitCore
         /// <returns></returns>
         public bool Validate(bool validateValue, ref string message)
         {
-            message = null;
+            message = "";
             return true;
         }
         /// <summary>
@@ -152,9 +157,11 @@ namespace CasterUnitCore
         /// <summary>
         /// can be used as bool, I hope this will not be confusing
         /// </summary>
-        public static implicit operator bool(CapeBooleanParameter boolParameter)
-        {
-            return (bool)boolParameter.value;
-        }
+        //public static implicit operator bool(CapeBooleanParameter boolParameter)
+        //{
+        //    return (bool)boolParameter.value;
+        //}
+        //Comment this method to clarify the usage, it should be used as a class, not a double
+
     }
 }

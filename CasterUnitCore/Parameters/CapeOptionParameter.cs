@@ -48,12 +48,14 @@ namespace CasterUnitCore
         private string assemblyName;
 
         #region Constructor
+
         /// <summary>
         /// default name is "optionParameter" without any option
         /// </summary>
         public CapeOptionParameter()
             : this("optionParameter", (IEnumerable<string>)null, CapeParamMode.CAPE_INPUT_OUTPUT)
         { }
+
         /// <summary>
         /// use string array to initialize, better use enum
         /// </summary>
@@ -63,12 +65,22 @@ namespace CasterUnitCore
             : base(name, CapeParamType.CAPE_OPTION, mode, UnitCategoryEnum.Dimensionless)
         {
             this.enumType = null;
-            _optionList = new List<string>(optionList);
+            if (optionList != null)
+                _optionList = new List<string>(optionList);
+            else
+                _optionList = new List<string>();
             RestrictedToList = restrictedToList;
-            if (defOption == null) defOption = _optionList[0];
-            DefaultValue = defOption;
+
+            if (_optionList.Count == 0)
+                DefaultValue = null;
+            else if (defOption == null)
+                DefaultValue = _optionList[0];
+            else
+                DefaultValue = defOption;
+
             _curOption = DefaultValue;
         }
+
         /// <summary>
         /// Highly Recommended! Use a enum type to initialize this parameter
         /// </summary>
@@ -79,32 +91,20 @@ namespace CasterUnitCore
             this.enumType = enumType;
             _optionList = new List<string>(enumType.GetEnumNames());
             RestrictedToList = restrictedToList;
-            if (defOption == null) DefaultValue = _optionList[0];
-            else DefaultValue = enumType.GetEnumName(defOption);
+
+            if (_optionList.Count == 0)
+                DefaultValue = null;
+            else if (defOption == null)
+                DefaultValue = _optionList[0];
+            else
+                DefaultValue = enumType.GetEnumName(defOption);
+
             _curOption = DefaultValue;
         }
         #endregion
 
         #region CapeParameterBase
-        /// <summary>
-        /// Check whether the value must be restricted to list and the option is not in the list
-        /// </summary>
-        /// <paramCollection name="message"></paramCollection>
-        /// <returns></returns>
-        public override bool Validate(ref string message)
-        {
-            bool isAvailable;
-            if (Type == CapeParamType.CAPE_OPTION)
-                isAvailable = Validate(_curOption, ref message);
-            else
-                isAvailable = false;  //未知参数类型当然不能用
 
-            if (isAvailable)
-                ValStatus = CapeValidationStatus.CAPE_VALID;
-            else
-                ValStatus = CapeValidationStatus.CAPE_INVALID;
-            return isAvailable;
-        }
         /// <summary>
         /// Check whether the value must be restricted to list and the option is not in the list
         /// </summary>
@@ -115,6 +115,22 @@ namespace CasterUnitCore
             return Validate(ref message);
         }
         /// <summary>
+        /// Check whether the value must be restricted to list and the option is not in the list
+        /// </summary>
+        /// <paramCollection name="message"></paramCollection>
+        /// <returns></returns>
+        public override bool Validate(ref string message)
+        {
+            bool isAvailable;
+            isAvailable = Validate(_curOption, ref message);
+
+            ValStatus = isAvailable
+                ? CapeValidationStatus.CAPE_VALID
+                : CapeValidationStatus.CAPE_INVALID;
+            return isAvailable;
+        }
+
+        /// <summary>
         /// reset value to default value
         /// </summary>
         public override void Reset()
@@ -123,6 +139,7 @@ namespace CasterUnitCore
             ValStatus = CapeValidationStatus.CAPE_NOT_VALIDATED;
             Dirty = true;
         }
+
         /// <summary>
         /// accept string or enum or ICapeOptionParameterSpec
         /// </summary>
@@ -132,22 +149,27 @@ namespace CasterUnitCore
             set
             {
                 string v;
-                if (value is string)
+                try
                 {
-                    v = Convert.ToString(value);
+                    if (value is ICapeOptionParameterSpec)
+                    {
+                        v = (string)((ICapeParameter)value).value;
+                    }
+                    else if (value is Enum && value.GetType() == enumType)
+                    {
+                        v = ((Enum)value).ToString();
+                    }
+                    else
+                    {
+                        v = Convert.ToString(value);
+                    }
                 }
-                else if (value is ICapeOptionParameterSpec)
+                catch (Exception e)
                 {
-                    v = (string)((ICapeParameter)value).value;
+                    throw new ECapeUnknownException(this,
+                        "value is not string or specified enum or ICapeOptionParameterSpec");
                 }
-                else if (value is Enum && value.GetType() == enumType)
-                {
-                    v = ((Enum)value).ToString();
-                }
-                else
-                {
-                    throw new ECapeUnknownException(this,"value is not string or specified enum or ICapeOptionParameterSpec");
-                }
+
                 if (v == _curOption) return;
                 _curOption = v;
                 Dirty = true;
@@ -157,8 +179,10 @@ namespace CasterUnitCore
         public override object Clone()
         {
             if (enumType == null)
-                return new CapeOptionParameter(this.ComponentName, (IEnumerable<string>)this.OptionList,
-                this.Mode, this.DefaultValue, this.RestrictedToList)
+                return new CapeOptionParameter(
+                    this.ComponentName, 
+                    (IEnumerable<string>)this.OptionList,
+                    this.Mode, this.DefaultValue, this.RestrictedToList)
                 {
                     ComponentDescription = this.ComponentDescription,
                     value = this.value,
@@ -176,6 +200,7 @@ namespace CasterUnitCore
         #endregion
 
         #region ICapeOptionParameterSpec
+
         /// <summary>
         /// Check whether the value must be restricted to list and the option is not in the list
         /// </summary>
@@ -196,6 +221,7 @@ namespace CasterUnitCore
                 return true;
             }
         }
+
         /// <summary>
         /// get and set option list
         /// </summary>
@@ -217,10 +243,12 @@ namespace CasterUnitCore
                     throw new COMException("value must be a enum or IEnumerable<string>");
             }
         }
+
         /// <summary>
         /// default value
         /// </summary>
         public string DefaultValue { get; set; }
+
         /// <summary>
         /// whether the value can be outside of option list
         /// </summary>
@@ -244,62 +272,32 @@ namespace CasterUnitCore
         {
             return CompareTo(other.ToString());
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator ==(CapeOptionParameter thisParameter, string other)
         {
             return (object)thisParameter != null && thisParameter.CompareTo(other) == 0;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator !=(CapeOptionParameter thisParameter, string other)
         {
             return !(thisParameter == other);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator ==(CapeOptionParameter thisParameter, ICapeOptionParameterSpec other)
         {
             return (object)thisParameter != null && thisParameter.CompareTo(other) == 0;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator !=(CapeOptionParameter thisParameter, ICapeOptionParameterSpec other)
         {
             return !(thisParameter == other);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator ==(CapeOptionParameter thisParameter, Enum other)
         {
             return (object)thisParameter != null && thisParameter.CompareTo(other) == 0;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <paramCollection name="thisParameter"></paramCollection>
-        /// <paramCollection name="other"></paramCollection>
-        /// <returns></returns>
+
         public static bool operator !=(CapeOptionParameter thisParameter, Enum other)
         {
             return !(thisParameter == other);
@@ -307,7 +305,11 @@ namespace CasterUnitCore
 
         public override bool Equals(object obj)
         {
-            if (obj is string || obj is ICapeOptionParameterSpec || obj is Enum)
+            if (obj is string)
+                return (string)obj == this._curOption;
+            else if (obj is Enum)
+                return obj.ToString() == this._curOption;
+            else if (obj is ICapeOptionParameterSpec)
                 return obj == this;
             else
                 return false;
@@ -325,16 +327,17 @@ namespace CasterUnitCore
         /// </summary>
         /// <paramCollection name="optionParameter"></paramCollection>
         /// <returns></returns>
-        public static implicit operator string(CapeOptionParameter optionParameter)
+        public static explicit operator string(CapeOptionParameter optionParameter)
         {
             return optionParameter.value as string;
         }
+
         /// <summary>
         /// convert to Enum
         /// </summary>
         /// <paramCollection name="optionParameter"></paramCollection>
         /// <returns></returns>
-        public static implicit operator Enum(CapeOptionParameter optionParameter)
+        public static explicit operator Enum(CapeOptionParameter optionParameter)
         {
             foreach (var e in Enum.GetValues(optionParameter.enumType))
                 if ((string)optionParameter.value == e.ToString())

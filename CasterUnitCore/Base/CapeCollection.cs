@@ -45,7 +45,7 @@ namespace CasterUnitCore
         /// <summary>
         /// IsReadOnly is default set to false
         /// </summary>
-        public CapeCollection(string name = null, string description = null, bool canRename = false)
+        public CapeCollection(string name = null, string description = "", bool canRename = false)
             : base(name, description, canRename)
         {
             IsReadOnly = false;
@@ -79,8 +79,34 @@ namespace CasterUnitCore
         /// <paramCollection name="index">Start from one!!! int, not long</paramCollection>
         public ICapeIdentification this[int index]
         {
-            get { return this._items[_keys[index]]; }
-            set { this._items[_keys[index]] = value; }
+            get
+            {
+                try
+                {
+                    return this._items[_keys[index]];
+                }
+                catch (Exception e)
+                {
+                    if (e is ArgumentOutOfRangeException)
+                        throw new ECapeUnknownException(this, e);
+                    else
+                        throw;
+                }
+            }
+            set
+            {
+                try
+                {
+                    this._items[_keys[index]] = value;
+                }
+                catch (Exception e)
+                {
+                    if (e is ArgumentOutOfRangeException)
+                        throw new ECapeUnknownException(this, e);
+                    else
+                        throw;
+                }
+            }
         }
 
         /// <summary>
@@ -88,8 +114,35 @@ namespace CasterUnitCore
         /// </summary>
         public ICapeIdentification this[string key]
         {
-            get { return this._items[key]; }
-            set { this._items[key] = value; }
+            get
+            {
+                try
+                {
+                    return this._items[key];
+                }
+                catch (Exception e)
+                {
+                    if (e is KeyNotFoundException)
+                        throw new ECapeUnknownException(this, e);
+                    else
+                        throw;
+                }
+            }
+            set
+            {
+                try
+                {
+                    this._items[key] = value;
+                }
+                catch (Exception e)
+                {
+                    if (e is KeyNotFoundException)
+                        throw new ECapeUnknownException(this, e);
+                    else
+                        throw;
+                }
+
+            }
         }
 
         /// <summary>
@@ -246,7 +299,7 @@ namespace CasterUnitCore
             foreach (var key in _keys)
             {
                 newCollection._keys.Add(key);
-                newCollection._items.Add(key, (ICapeIdentification)((CapeOpenBaseObject)this._items[key]).Clone());
+                newCollection._items.Add(key, ((CapeOpenBaseObject)this._items[key]).Clone() as ICapeIdentification);
             }
             return newCollection;
         }
