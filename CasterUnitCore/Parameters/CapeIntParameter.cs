@@ -239,10 +239,10 @@ namespace CasterUnitCore
         /// </summary>
         /// <paramCollection name="intParameter"></paramCollection>
         /// <returns></returns>
-        //public static implicit operator int(CapeIntParameter intParameter)
-        //{
-        //    return intParameter.value;
-        //}
-        //Comment this method to clarify the usage, it should be used as a class, not a double
+        public static explicit operator int(CapeIntParameter intParameter)
+        {
+            return intParameter.value;
+        }
+        //explicit this method to clarify the usage, it should be used as a class, not a double
     }
 }

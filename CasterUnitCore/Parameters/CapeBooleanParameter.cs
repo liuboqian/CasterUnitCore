@@ -157,11 +157,11 @@ namespace CasterUnitCore
         /// <summary>
         /// can be used as bool, I hope this will not be confusing
         /// </summary>
-        //public static implicit operator bool(CapeBooleanParameter boolParameter)
-        //{
-        //    return (bool)boolParameter.value;
-        //}
-        //Comment this method to clarify the usage, it should be used as a class, not a double
+        public static explicit operator bool(CapeBooleanParameter boolParameter)
+        {
+            return (bool)boolParameter.value;
+        }
+        //explicit this method to clarify the usage, it should be used as a class, not a double
 
     }
 }

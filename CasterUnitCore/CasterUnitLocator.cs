@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CasterUnitCore
 {
+    /// <summary>
+    /// This class is used to locate a CasterUnit
+    /// </summary>
     public static class CasterUnitLocator
     {
         static Dictionary<string, CasterUnitOperationBase> unitcache=new Dictionary<string,CasterUnitOperationBase>();

@@ -63,7 +63,7 @@ namespace CasterUnitCore
         /// <paramCollection name="mode">if set to Input, the value won't change with unit in default window</paramCollection>
         public CapeRealParameter(string name, UnitCategoryEnum unitCategory,
             CapeParamMode mode, double minVal = double.MinValue,
-            double maxVal = double.MaxValue, double defaultVal = Double.NaN)
+            double maxVal = double.MaxValue, double defaultVal = double.NaN)
             : base(name, CapeParamType.CAPE_REAL, mode, unitCategory)
         {
             this.LowerBound = minVal;
@@ -79,7 +79,7 @@ namespace CasterUnitCore
         #region ICapeParameter
 
         /// <summary>
-        /// SI value, can be set to double, string, ICapeRealParameterSpec
+        /// display value, can be set to double, string, ICapeRealParameterSpec
         /// </summary>
         public override dynamic value
         {
@@ -111,6 +111,12 @@ namespace CasterUnitCore
                 _dblvalue = v;
                 Dirty = true;
             }
+        }
+
+        double SIValue
+        {
+            get { return Units.ConvertToSI(value, CurrentUnit, CurrentUnitCategory); }
+            set { this.value = Units.ConvertFromSI(CurrentUnit, value, CurrentUnitCategory); }
         }
 
         public override object Clone()
@@ -262,11 +268,11 @@ namespace CasterUnitCore
         /// <summary>
         /// can convert to double
         /// </summary>
-        //public static implicit operator double(CapeRealParameter realParameter)
-        //{
-        //    return realParameter.value;
-        //}
-        //Comment this method to clarify the usage, it should be used as a class, not a double
+        public static explicit operator double(CapeRealParameter realParameter)
+        {
+            return realParameter.SIValue;
+        }
+        //explicit this method to clarify the usage, it should be used as a class, not a double
 
     }
 }

@@ -27,7 +27,7 @@ namespace CasterUnitCore
                     Debug.WriteLine("Get NamedValueList Failed.");
                     return new string[0];
                 }
-                return (_utilities.NamedValueList as IEnumerable<string>).ToArray();
+                return (_utilities.NamedValueList as IEnumerable<string>)?.ToArray();
             }
         }
 

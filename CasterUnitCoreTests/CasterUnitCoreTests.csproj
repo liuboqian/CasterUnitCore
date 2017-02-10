@@ -63,6 +63,13 @@
     <Compile Include="Parameters\CapeRealParameterTests.cs" />
     <Compile Include="Parameters\UnitsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimulationContext\CapeCOSEUtilitiesTests.cs" />
+    <Compile Include="SimulationContext\CapeDiagnosticTests.cs" />
+    <Compile Include="SimulationContext\CapeMaterialTemplateSystemTests.cs" />
+    <Compile Include="SimulationContext\SimpleSimulationContext.cs" />
+    <Compile Include="SimulationContext\SimpleThermoMaterialTemplate.cs" />
+    <Compile Include="Streams\MaterialObject10Tests.cs" />
+    <Compile Include="Streams\SimpleMaterialObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CasterUnitCore\CasterUnitCore.csproj">

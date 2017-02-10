@@ -27,7 +27,7 @@ namespace CasterUnitCore
                     Debug.WriteLine("Get MaterialTemplates Failed.");
                     return new string[0];
                 }
-                return (_materialTemplateSystem.MaterialTemplates as IEnumerable<string>).ToArray();
+                return (_materialTemplateSystem.MaterialTemplates as IEnumerable<string>)?.ToArray();
             }
         }
 
