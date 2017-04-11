@@ -22,6 +22,11 @@ using CAPEOPEN;
 namespace CasterUnitCore
 {
     /// <summary>
+    /// a function used to filter parameters, same as Func&lt;ICapeIdentification,bool&gt;
+    /// </summary>
+    public delegate bool ValidateFunc(ICapeIdentification item);
+
+    /// <summary>
     /// This class contains a collection of ICapeIdentification, with a key default set to its name, and can also use index to locate item
     /// </summary>
     [Serializable]
@@ -39,16 +44,27 @@ namespace CasterUnitCore
         /// contains keys in the order when it was added
         /// </summary>
         protected List<string> _keys = new List<string>();
-        //按照保存的顺序将值保存在keys中，这样既可以使用数字也可以使用字符串访问
+        //the value is keeped both in keys and index, makes it possible to access through index or its name
+        /// <summary>
+        /// Validation for insert value
+        /// </summary>
+        protected ValidateFunc constraint = null;
+
 
         #region Constructor
+
         /// <summary>
-        /// IsReadOnly is default set to false
+        /// Constructor of CapeCollection
         /// </summary>
-        public CapeCollection(string name = null, string description = "", bool canRename = false)
+        /// <param name="name">the name of this collection</param>
+        /// <param name="description">discription of this collection</param>
+        /// <param name="constraint">a Func&lt;ICapeIdentification,bool&gt; delegate, used to validate items.</param>
+        /// <param name="canRename">Is the collection can be renamed.</param>
+        public CapeCollection(string name = null, string description = "", /*Func<ICapeIdentification, bool>*/ValidateFunc constraint = null, bool canRename = false)
             : base(name, description, canRename)
         {
             IsReadOnly = false;
+            this.constraint = constraint as ValidateFunc;
         }
 
         #endregion
@@ -66,17 +82,18 @@ namespace CasterUnitCore
                 else
                     throw new ECapeUnknownException(this, "index can only be int or string");
             }
-            catch (Exception e)
+            catch (ArgumentOutOfRangeException e)
             {
                 throw new ECapeUnknownException(this,
-                    "Index not avaliable. Count:" + Count.ToString() + " Wanted" + id.ToString());
+                    $"Index not avaliable. Count: {Count}, Wanted {id}",
+                    e);
             }
         }
 
         /// <summary>
         /// return value by index, index starts from one!!! According to CO standard
         /// </summary>
-        /// <paramCollection name="index">Start from one!!! int, not long</paramCollection>
+        /// <paramCollection name="index">Start from one!!!</paramCollection>
         public ICapeIdentification this[int index]
         {
             get
@@ -85,12 +102,11 @@ namespace CasterUnitCore
                 {
                     return this._items[_keys[index]];
                 }
-                catch (Exception e)
+                catch (ArgumentOutOfRangeException e)
                 {
-                    if (e is ArgumentOutOfRangeException)
-                        throw new ECapeUnknownException(this, e);
-                    else
-                        throw;
+                    throw new ECapeUnknownException(this,
+                        $"Index not avaliable. Count: {Count}, Wanted {index}",
+                        e);
                 }
             }
             set
@@ -99,12 +115,11 @@ namespace CasterUnitCore
                 {
                     this._items[_keys[index]] = value;
                 }
-                catch (Exception e)
+                catch (ArgumentOutOfRangeException e)
                 {
-                    if (e is ArgumentOutOfRangeException)
-                        throw new ECapeUnknownException(this, e);
-                    else
-                        throw;
+                    throw new ECapeUnknownException(this,
+                        $"Index not avaliable. Count: {Count}, Wanted {index}",
+                        e);
                 }
             }
         }
@@ -120,28 +135,19 @@ namespace CasterUnitCore
                 {
                     return this._items[key];
                 }
-                catch (Exception e)
+                catch (KeyNotFoundException e)
                 {
-                    if (e is KeyNotFoundException)
-                        throw new ECapeUnknownException(this, e);
-                    else
-                        throw;
+                    throw new ECapeUnknownException(this,
+                        $"Key not avaliable. Wanted: {key}",
+                        e);
                 }
             }
             set
             {
-                try
-                {
+                if (!_items.ContainsKey(key))
+                    Add(key, value);
+                else
                     this._items[key] = value;
-                }
-                catch (Exception e)
-                {
-                    if (e is KeyNotFoundException)
-                        throw new ECapeUnknownException(this, e);
-                    else
-                        throw;
-                }
-
             }
         }
 
@@ -192,29 +198,42 @@ namespace CasterUnitCore
             string autokey = item.ComponentName;
             Add(autokey, item);
         }
+
         /// <summary>
         /// Add an item with a key
         /// </summary>
         public void Add(string key, ICapeIdentification item)
         {
+            if (constraint != null && !constraint(item))
+                throw new ECapeUnknownException(this,
+                    $"{key} is not a valid item in this collection - {name}.");
             if (_items.ContainsValue(item))
-                throw new ECapeUnknownException(this, "This Collection already has the same item.");
+                throw new ECapeUnknownException(this,
+                    $"This Collection already has the same item: {item.ComponentName}.");
             if (_items.ContainsKey(key))
-                throw new ECapeUnknownException(this, "This collection already has an item with the same key.");
+                throw new ECapeUnknownException(this,
+                    $"This collection already has an item with the same key: {key}.");
             _keys.Add(key);
             _items.Add(key, item);
         }
 
+        /// <summary>
+        /// Wipe all items
+        /// </summary>
         public void Clear()
         {
             _keys.Clear();
             _items.Clear();
         }
 
+        /// <summary>
+        /// contains an item with the same key
+        /// </summary>
         public bool Contains(CapeCollectionPair item)
         {
             return Contains(item.Key) && Contains(item.Value);
         }
+
         /// <summary>
         /// whether CapeCollection contains this item
         /// </summary>
@@ -222,6 +241,7 @@ namespace CasterUnitCore
         {
             return _items.ContainsValue(item);
         }
+
         /// <summary>
         /// whether CapeCollection contains item with this key
         /// </summary>
@@ -243,6 +263,7 @@ namespace CasterUnitCore
             if (!Contains(item)) return false;
             return Remove(item.Key);
         }
+
         /// <summary>
         /// Remove item with this key
         /// </summary>
@@ -272,20 +293,28 @@ namespace CasterUnitCore
 
         public bool IsReadOnly { get; protected set; }
 
-        #endregion
+        /// <summary>
+        /// return item keys, in inserting order
+        /// </summary>
+        public string[] Keys => _keys.ToArray();
 
         /// <summary>
         /// Return item array, without key
         /// </summary>
-        public ICapeIdentification[] GetValueArray()
+        public ICapeIdentification[] Values
         {
-            ICapeIdentification[] array = new ICapeIdentification[Count];
-            for (int i = 0; i < Count; i++)
+            get
             {
-                array[i] = _items[_keys[i]];
+                ICapeIdentification[] array = new ICapeIdentification[Count];
+                for (int i = 0; i < Count; i++)
+                {
+                    array[i] = _items[_keys[i]];
+                }
+                return array;
             }
-            return array;
         }
+
+        #endregion
 
         #region ICloneable
 
@@ -295,7 +324,7 @@ namespace CasterUnitCore
         public override object Clone()
         {
             CapeCollection newCollection = new CapeCollection(this.ComponentName,
-                this.ComponentDescription, this.CanRename);
+                this.ComponentDescription, this.constraint, this.CanRename);
             foreach (var key in _keys)
             {
                 newCollection._keys.Add(key);

@@ -77,7 +77,9 @@ namespace CasterUnitCore
             set
             {
                 if (!CanRename)
-                    throw new ECapeUnknownException(this,"Rename Failed:"+ComponentName + " cannot be renamed.","ICapeIdentification");
+                    throw new ECapeUnknownException(this,
+                        $"Rename Failed: {ComponentName} cannot be renamed.",
+                        null, "ICapeIdentification");
                 _name = value;
                 Dirty = true;
             }
@@ -97,7 +99,9 @@ namespace CasterUnitCore
         /// </summary>
         public virtual object Clone()
         {
-            throw new ECapeUnknownException(this,new NotImplementedException(),typeof(ICloneable).ToString());
+            throw new ECapeUnknownException(this,
+                $"{ComponentName} have not implemented ICloneable interface.",
+                new NotImplementedException(), typeof(ICloneable).ToString());
         }
 
         #endregion

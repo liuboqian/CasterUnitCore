@@ -29,7 +29,7 @@ namespace CasterUnitSample
     [CapeVendorURL("")]
     [CapeVersion("1.1")]
     [ComDefaultInterface(typeof(ICapeUnit))]
-    public class CasterUnitSample:CasterUnitOperationBase,ICapeUnit
+    public class CasterUnitSample : CasterUnitOperationBase, ICapeUnit
     {
         public CasterUnitSample()
             : base(new TestCalculator(), "CasterUnitSample", "This unit is a test to the CasterUnitCore.")
@@ -37,12 +37,13 @@ namespace CasterUnitSample
 
         public override void InitParameters()
         {
-            Parameters = new CapeCollection("Parameters", "this is the parameter collection of test unit.");
-            CapeRealParameter ParamT = new CapeRealParameter("T", UnitCategoryEnum.Temperature, CapeParamMode.CAPE_INPUT, defaultVal: 500);
+            CapeRealParameter ParamT = new CapeRealParameter("T", UnitCategoryEnum.Temperature,
+                CapeParamMode.CAPE_INPUT, defaultVal: 500);
             ParamT.ComponentDescription = "temperature of outlet material";
-            Parameters.Add(ParamT);
-            CapeRealParameter ParamP = new CapeRealParameter("P", UnitCategoryEnum.Pressure, CapeParamMode.CAPE_INPUT, defaultVal: 200000);
+            CapeRealParameter ParamP = new CapeRealParameter("P", UnitCategoryEnum.Pressure, 
+                CapeParamMode.CAPE_INPUT, defaultVal: 200000);
             ParamP.ComponentDescription = "pressure of outlet material";
+            Parameters.Add(ParamT);
             Parameters.Add(ParamP);
 
             Parameters.Add(new CapeIntParameter("intParam", CapeParamMode.CAPE_INPUT));
@@ -52,7 +53,6 @@ namespace CasterUnitSample
 
         public override void InitPorts()
         {
-            Ports = new CapeCollection("Ports", "this is the port collection of test unit.");
             Ports.Add(new CapeMaterialPort("feed", CapePortDirection.CAPE_INLET, "Inlet Material"));
             Ports.Add(new CapeMaterialPort("product", CapePortDirection.CAPE_OUTLET, "Outlet Material"));
             //Ports.Add(new CapeEnergyPort("energy", CapePortDirection.CAPE_INLET));
@@ -61,13 +61,17 @@ namespace CasterUnitSample
 
         public override void InitResults()
         {
-            Results = new CapeCollection("Results", "this is the result collection of test unit.");
             CapeRealParameter ParamTout = new CapeRealParameter("Tout", UnitCategoryEnum.Temperature, CapeParamMode.CAPE_OUTPUT);
             ParamTout.ComponentDescription = "temperature of actual outlet material";
             Results.Add(ParamTout);
             CapeRealParameter ParamPout = new CapeRealParameter("Pout", UnitCategoryEnum.Pressure, CapeParamMode.CAPE_OUTPUT);
             ParamPout.ComponentDescription = "pressure of actual outlet material";
             Results.Add(ParamPout);
+
+            Results.Add(new CapeIntParameter("intParam", CapeParamMode.CAPE_OUTPUT));
+            Results.Add(new CapeBooleanParameter("boolParam", true, CapeParamMode.CAPE_OUTPUT));
+            Results.Add(new CapeOptionParameter("optionParam", typeof(Options), CapeParamMode.CAPE_OUTPUT));
+
         }
     }
 }

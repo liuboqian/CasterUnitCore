@@ -117,12 +117,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Reports\LastRunReport.cs" />
+    <Compile Include="Reports\ReportBase.cs" />
+    <Compile Include="Reports\StatusReport.cs" />
     <Compile Include="SimulationContext\CapeCOSEUtilities.cs" />
     <Compile Include="SimulationContext\CapeMaterialTemplateSystem.cs" />
     <Compile Include="Streams\CapeEnergyPort.cs" />
     <Compile Include="Streams\CapeInformationPort.cs" />
     <Compile Include="Streams\CapeMaterialPort.cs" />
-    <Compile Include="Streams\CapeUnitPort.cs" />
+    <Compile Include="Streams\CapeUnitPortBase.cs" />
     <Compile Include="Streams\MaterialObject.cs" />
     <Compile Include="Streams\MaterialObject10.cs" />
     <Compile Include="Streams\MaterialObject11.cs" />

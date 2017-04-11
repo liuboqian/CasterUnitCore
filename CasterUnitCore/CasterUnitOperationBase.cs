@@ -13,6 +13,7 @@
 * limitations under the License.*/
 
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -25,6 +26,7 @@ using CAPEOPEN;
 using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CasterUnitCore.Reports;
 
 namespace CasterUnitCore
 {
@@ -38,7 +40,7 @@ namespace CasterUnitCore
     [ComDefaultInterface(typeof(ICapeUnit))]
     [Guid("E78BFCC3-4865-4AF5-8BEE-276C49DE506F")]
     public abstract class CasterUnitOperationBase
-        : CapeOpenBaseObject, ICapeUnit, ICapeUtilities, IPersistStream  //The origin CAPE-OPEN IPersistStream has a problem, so overload it
+        : CapeOpenBaseObject, ICapeUnit, ICapeUtilities, ICapeUnitReport, IPersistStream  //The origin CAPE-OPEN IPersistStream has a problem, so overload it
     {
         #region fields
 
@@ -65,19 +67,25 @@ namespace CasterUnitCore
         /// <summary>
         /// Collection of ports connected to this unit
         /// </summary>
-        public CapeCollection Ports;
+        public readonly CapeCollection Ports;
         /// <summary>
         /// Collection of Parameters, should be CAPE_INPUT or CAPE_INPUT_OUTPUT
         /// </summary>
-        public CapeCollection Parameters;
+        public readonly CapeCollection Parameters;
         /// <summary>
         /// Collection of results, should be CAPE_OUTPUT Parameters, used to display results after calculation
         /// </summary>
-        public CapeCollection Results;
+        public readonly CapeCollection Results;
         /// <summary>
         /// Unique id of an instance, to identify the unit in CasterUnitLocator, default using Guid
         /// </summary>
-        public readonly string unitId;
+        public readonly string UnitId;
+        /// <summary>
+        /// Contains reports available to this unit operation
+        /// </summary>
+        public readonly List<ReportBase> Reports;
+
+        private ReportBase _selectedReport;
 
         #endregion
 
@@ -112,34 +120,63 @@ namespace CasterUnitCore
         public CasterUnitOperationBase(Calculator specCalculator, string className, string description)
             : base(className, description, true)
         {
+            Debug.WriteLine("UnitOperation Initializing.");
+
             this.SpecCalculator = specCalculator;
             SpecCalculator.UnitOp = this;
-            Ports = new CapeCollection("Ports", "In and Out ports of this unit.");
-            Parameters = new CapeCollection("Parameters", "User input Parameters of this unit.");
-            Results = new CapeCollection("Results", "Calculate Results, output Parameters.");
-            InitParameters();
-            InitPorts();
-            InitResults();
             Isloaded = false;
-            unitId = Guid.NewGuid().ToString("B");
+            UnitId = Guid.NewGuid().ToString("B");
+
+            Ports = new CapeCollection("Ports",
+                "In and Out ports of this unit.",
+                (item) => item is ICapeUnitPort);
+
+            Parameters = new CapeCollection("Parameters",
+                "User input Parameters of this unit.",
+                (item) =>
+                    item is ICapeParameter &&
+                    (item as ICapeParameter).Mode != CapeParamMode.CAPE_OUTPUT);
+
+            Results = new CapeCollection("Results",
+                "Calculate Results, output Parameters.",
+                (item) =>
+                    item is ICapeParameter &&
+                    (item as ICapeParameter).Mode != CapeParamMode.CAPE_INPUT);
+
+            Reports = new List<ReportBase>();
+
+            Debug.WriteLine("UnitOperation Initialize Completed.");
         }
 
         #endregion
 
-        #region Get Parameters And Ports
+        #region Get Parameters, Ports and Reports
+
         /// <summary>
         /// Add parameter to Parameters.
         /// if you use some variable point to the variable in Parameters, they might change before BeforeCalculate
         /// </summary>
         public abstract void InitParameters();
+
         /// <summary>
         /// Add port to Ports
         /// </summary>
         public abstract void InitPorts();
+
         /// <summary>
         /// Add result parameter to Results
         /// </summary>
         public abstract void InitResults();
+
+        /// <summary>
+        /// Add available reports
+        /// </summary>
+        public virtual void InitReports()
+        {
+            Reports.Add(new StatusReport());
+            Reports.Add(new LastRunReport());
+        }
+
         /// <summary> 
         /// Default action is to check whether all Parameters is valid, override to customize
         /// </summary>
@@ -159,6 +196,7 @@ namespace CasterUnitCore
             if (valid) return true;
             else return false;
         }
+
         /// <summary>
         /// Default action is to check if an inlet and a outlet material is connected, override to customize
         /// </summary>
@@ -199,6 +237,7 @@ namespace CasterUnitCore
         #endregion
 
         #region ICapeUnit
+
         /// <summary>
         /// raw Calculate interface called by simulator, NO need to modify this
         /// </summary>
@@ -211,6 +250,7 @@ namespace CasterUnitCore
             CapeDiagnostic.LogMessage("{0} : Calculate Complete.", ComponentName);
             SpecCalculator.OutputResult();
         }
+
         /// <summary>
         /// This method will call ParameterValidate and PortValidate, in most case, no need to override this, just override ParameterValidate and PortValidate
         /// </summary>
@@ -240,7 +280,7 @@ namespace CasterUnitCore
         /// <summary>
         /// raw ports interface called by simulator
         /// </summary>
-        public virtual object ports
+        object ICapeUnit.ports
         {
             get
             {
@@ -267,11 +307,39 @@ namespace CasterUnitCore
         {
             Debug.WriteLine("Initialize");
 
-            CasterUnitLocator.Register(unitId, this);
+            CasterUnitLocator.Register(UnitId, this);
+
+            //Is bad to use virtual method here, but considering that I have create three instances above, so it works for now.
+            try
+            {
+                Debug.WriteLine("Start Initialize Parameters.");
+                InitParameters();
+
+                Debug.WriteLine("Start Initialize Ports.");
+                InitPorts();
+
+                Debug.WriteLine("Start Initialize Results.");
+                InitResults();
+
+                Debug.WriteLine("Start Initialize Reports.");
+                InitReports();
+
+                foreach (var report in Reports)
+                {
+                    report.SetUnitOp(this);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Initialize Failed.");
+                throw new ECapeUnknownException(this,
+                    "UnitOperation Initialize Failed.",
+                    e);
+            }
 
             OnInitialize?.Invoke();
 
-            Debug.WriteLine("Initialize Done.");
+            Debug.WriteLine("Initialize Completed.");
         }
 
         /// <summary>
@@ -287,10 +355,10 @@ namespace CasterUnitCore
 
             foreach (var port in Ports)
             {
-                ((CapeUnitPort)port.Value).Disconnect();
+                ((CapeUnitPortBase)port.Value).Disconnect();
             }
 
-            CasterUnitLocator.UnRegister(unitId);
+            CasterUnitLocator.UnRegister(UnitId);
 
             Debug.WriteLine("Terminate Done.");
         }
@@ -329,10 +397,11 @@ namespace CasterUnitCore
             GuiThread.DisableComObjectEagerCleanup();
             GuiThread.Abort();
         }
+
         /// <summary>
         /// raw Parameters interface called by simulator
         /// </summary>
-        public object parameters
+        object ICapeUtilities.parameters
         {
             get
             {
@@ -340,6 +409,7 @@ namespace CasterUnitCore
                 return Parameters;
             }
         }
+
         /// <summary>
         /// set and get simulationContext interface passed by simulator
         /// </summary>
@@ -352,6 +422,47 @@ namespace CasterUnitCore
                 CapeDiagnostic.SetSimulationContext(value as ICapeDiagnostic);
                 CapeMaterialTemplateSystem.SetSimulationContext(value as ICapeMaterialTemplateSystem);
                 CapeCOSEUtilities.SetSimulationContext(value as ICapeCOSEUtilities);
+            }
+        }
+
+        #endregion
+
+        #region ICapeUnitReport
+
+        public virtual void ProduceReport(ref string message)
+        {
+            message = SelectedReportObj?.ProduceReport();
+        }
+
+        dynamic ICapeUnitReport.reports =>
+           (from report in Reports select report.Name).ToArray();
+
+        public virtual ReportBase SelectedReportObj
+        {
+            get => _selectedReport != null ?
+                _selectedReport :
+                Reports.FirstOrDefault();
+            set
+            {
+                if (!Reports.Contains(value))
+                    throw new ECapeUnknownException(this,
+                        $"{value.Name} is not an avaliable option for {ComponentName}",
+                        null, typeof(ICapeUnitReport).ToString());
+                _selectedReport = value;
+            }
+        }
+
+        public virtual string selectedReport
+        {
+            get => _selectedReport.Name;
+            set
+            {
+                var match = Reports.Find(x => x.Name == value);
+                if (match == null)
+                    throw new ECapeUnknownException(this,
+                        $"{value} is not an avaliable option for {ComponentName}",
+                        null, typeof(ICapeUnitReport).ToString());
+                SelectedReportObj = match;
             }
         }
 
@@ -399,6 +510,7 @@ namespace CasterUnitCore
             new BinaryFormatter().Serialize(memoryStream, objArray);
             pcbSize = memoryStream.Length;
         }
+
         /// <summary>
         /// Save ComponentName,ComponentDescription,Parameters,Results,Ports
         /// </summary>
@@ -443,6 +555,7 @@ namespace CasterUnitCore
                 Marshal.ReleaseComObject(pStm);
             }
         }
+
         /// <summary>
         /// Load ComponentName,ComponentDescription,Parameters,Results,Ports
         /// </summary>
@@ -510,6 +623,7 @@ namespace CasterUnitCore
         #endregion
 
         #region Register
+
         /// <summary>
         /// register function, no need to modify, the information will get through the Attribute of UnitOp class
         /// </summary>
@@ -625,6 +739,7 @@ namespace CasterUnitCore
             }
             keyCLSID.Close();
         }
+
         /// <summary>
         /// Unregister function
         /// </summary>

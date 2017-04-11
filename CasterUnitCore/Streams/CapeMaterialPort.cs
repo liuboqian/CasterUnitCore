@@ -29,7 +29,7 @@ namespace CasterUnitCore
     [ComVisible(true)]
     [Guid("C53E7E5D-CE57-4656-990A-7321D28BD396")]
     [ComDefaultInterface(typeof(ICapeUnitPort))]
-    public class CapeMaterialPort : CapeUnitPort
+    public class CapeMaterialPort : CapeUnitPortBase
     {
         [NonSerialized]
         protected MaterialObject _materialObject;

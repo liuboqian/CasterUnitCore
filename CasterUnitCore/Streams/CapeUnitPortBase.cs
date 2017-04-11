@@ -25,8 +25,8 @@ namespace CasterUnitCore
     //[ComVisible(true)]
     //[Guid("C53E7E5D-CE57-4656-990A-7321D28BD396")]
     //[ComDefaultInterface(typeof(ICapeUnitPort))]
-    public abstract class CapeUnitPort
-        : CapeOpenBaseObject, ICapeUnitPort
+    public abstract class CapeUnitPortBase
+        : CapeOpenBaseObject, ICapeUnitPort, ICapeUnitPortVariables
     {
         protected CapePortDirection _portDirection;
         protected CapePortType _portType;
@@ -34,7 +34,7 @@ namespace CasterUnitCore
         /// <summary>
         /// default name is "capeUnitPort"
         /// </summary>
-        protected CapeUnitPort(string name, CapePortType type, CapePortDirection portDirection, string description = "", bool canRename = false)
+        protected CapeUnitPortBase(string name, CapePortType type, CapePortDirection portDirection, string description = "", bool canRename = false)
             : base(name, description, canRename)
         {
             _portDirection = portDirection;
@@ -67,5 +67,15 @@ namespace CasterUnitCore
         /// </summary>
         public abstract bool IsConnected();
 
+        #region ICapeUnitPortVariables
+
+        public void SetIndex(string Variable_type, string Component, int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Variable => throw new NotImplementedException();
+
+        #endregion
     }
 }

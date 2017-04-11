@@ -147,7 +147,7 @@ namespace CasterUnitCore.Tests
         [TestMethod()]
         public void GetValueArrayTest()
         {
-            ICapeIdentification[] obj=collection.GetValueArray();
+            ICapeIdentification[] obj=collection.Values;
             Assert.AreEqual("real", obj[0].ComponentName);
             Assert.AreEqual("material", obj[1].ComponentName);
             Assert.AreEqual(2, obj.Length);

@@ -32,33 +32,36 @@ namespace CasterUnitCore
     {
         public CapeOpenBaseObject _errorObject;
 
+        public new Exception InnerException { get; set; }
+
         #region Constructor
 
-        /// <summary>
-        /// create a cape unknown exception by .net exception, obj should be the unit which throw the exception, in most case, it's UnitOp
-        /// </summary>
-        /// <paramCollection name="message"></paramCollection>
-        /// <paramCollection name="inner"></paramCollection>
-        public ECapeUnknownException(CapeOpenBaseObject obj, Exception inner, string interfaceName = null)
-            : base(inner.Message, inner)
-        {
-            _errorObject = obj;
-            this.HResult = (int)ECapeErrorHResult.ECapeUnknownHR;
-            this.name = inner.Message;
-            this.interfaceName = interfaceName;
-            obj.SetError(inner.Message, interfaceName, scope);
-        }
+        ///// <summary>
+        ///// create a cape unknown exception by .net exception, obj should be the unit which throw the exception, in most case, it's UnitOp
+        ///// </summary>
+        ///// <paramCollection name="message"></paramCollection>
+        ///// <paramCollection name="inner"></paramCollection>
+        //public ECapeUnknownException(CapeOpenBaseObject obj, Exception inner, string interfaceName = null)
+        //    : base(inner.Message, inner)
+        //{
+        //    _errorObject = obj;
+        //    this.InnerException = inner;
+        //    this.HResult = (int)ECapeErrorHResult.ECapeUnknownHR;
+        //    this.name = inner.Message;
+        //    this.interfaceName = interfaceName;
+        //    obj.SetError(inner.Message, interfaceName, scope);
+        //}
 
         /// <summary>
         /// create an cape unknown exception, obj should be the unit which throw the exception, in most case, it's UnitOp
         /// </summary>
-        /// <paramCollection name="message"></paramCollection>
-        public ECapeUnknownException(CapeOpenBaseObject obj, string message, string interfaceName = null)
+        public ECapeUnknownException(CapeOpenBaseObject obj, string message, Exception inner = null, string interfaceName = null)
             : base(message)
         {
             _errorObject = obj;
+            this.InnerException = inner;
             this.HResult = (int)ECapeErrorHResult.ECapeUnknownHR;
-            this.name = message;
+            this.name = message == null ? inner.Message : message;
             this.interfaceName = interfaceName;
             obj.SetError(message, interfaceName, scope);
         }
@@ -67,9 +70,9 @@ namespace CasterUnitCore
         /// throw an error, will create an empty CapeCollection to throw this exception
         /// </summary>
         public ECapeUnknownException(string message = null)
-            :base(message)
+            : base(message)
         {
-            _errorObject = new CapeCollection(name:"ErrorObj");
+            _errorObject = new CapeCollection(name: "ErrorObj");
             this.HResult = (int)ECapeErrorHResult.ECapeUnknownHR;
             this.name = null;
             this.interfaceName = interfaceName;

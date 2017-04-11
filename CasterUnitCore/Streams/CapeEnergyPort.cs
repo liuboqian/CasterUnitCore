@@ -28,7 +28,7 @@ namespace CasterUnitCore
     [ComVisible(true)]
     [Guid("E5D0D2E7-18E9-4FE4-A0DA-87B76D78A894")]
     [ComDefaultInterface(typeof(ICapeUnitPort))]
-    public class CapeEnergyPort : CapeUnitPort, IEnumerable<ICapeParameter>
+    public class CapeEnergyPort : CapeUnitPortBase, IEnumerable<ICapeParameter>
     {
         [NonSerialized]
         protected ICapeCollection paramCollection;
