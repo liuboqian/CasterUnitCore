@@ -69,12 +69,15 @@ namespace CasterUnitCore
 
         #region ICapeUnitPortVariables
 
-        public void SetIndex(string Variable_type, string Component, int index)
+        void ICapeUnitPortVariables.SetIndex(string Variable_type, string Component, int index)
         {
             throw new NotImplementedException();
         }
 
-        public int Variable => throw new NotImplementedException();
+        int ICapeUnitPortVariables.get_Variable(string Variable_type, string Component)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }

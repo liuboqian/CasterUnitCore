@@ -94,19 +94,19 @@ namespace CasterUnitCore
         /// <summary>
         /// Called during Initialize
         /// </summary>
-        public event Action OnInitialize;
+        public event EventHandler OnInitialize;
         /// <summary>
         /// Called during Terminate
         /// </summary>
-        public event Action OnTerminate;
+        public event EventHandler OnTerminate;
         /// <summary>
         /// Called when COSE ask for Parameters interface
         /// </summary>
-        public event Action<CapeCollection> OnGetParameters;
+        public event EventHandler<CapeCollection> OnGetParameters;
         /// <summary>
         /// Called when COSE ask for ports interface
         /// </summary>
-        public event Action<CapeCollection> OnGetPorts;
+        public event EventHandler<CapeCollection> OnGetPorts;
 
         #endregion
 
@@ -284,7 +284,7 @@ namespace CasterUnitCore
         {
             get
             {
-                OnGetPorts?.Invoke(Ports);
+                OnGetPorts?.Invoke(this, Ports);
                 return Ports;
             }
         }
@@ -336,8 +336,8 @@ namespace CasterUnitCore
                     "UnitOperation Initialize Failed.",
                     e);
             }
-
-            OnInitialize?.Invoke();
+            
+            OnInitialize?.Invoke(this,EventArgs.Empty);
 
             Debug.WriteLine("Initialize Completed.");
         }
@@ -348,7 +348,7 @@ namespace CasterUnitCore
         public virtual void Terminate()
         {
             Debug.WriteLine("Terminate");
-            OnTerminate?.Invoke();
+            OnTerminate?.Invoke(this,EventArgs.Empty);
 
             if (simulationContext != null && simulationContext.GetType().IsCOMObject)
                 Marshal.FinalReleaseComObject(simulationContext);
@@ -405,7 +405,7 @@ namespace CasterUnitCore
         {
             get
             {
-                OnGetParameters?.Invoke(Parameters);
+                OnGetParameters?.Invoke(this,Parameters);
                 return Parameters;
             }
         }
