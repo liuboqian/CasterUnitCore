@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CAPEOPEN;
+using CasterCore;
 
 namespace CasterUnitCore
 {
@@ -91,9 +92,19 @@ namespace CasterUnitCore
         }
   
         /// <summary>
-        /// Release resources, do nothing for now
+        /// Release COM resources, 这个类融合以后要移除
         /// </summary>
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Whether disposing is true or false, COM resource should be released.
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected abstract void Dispose(bool disposing);
 
         #endregion
 

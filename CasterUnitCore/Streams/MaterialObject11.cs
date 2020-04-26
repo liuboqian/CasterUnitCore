@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Windows;
 using CAPEOPEN;
+using CasterCore;
 
 namespace CasterUnitCore
 {
@@ -124,22 +125,22 @@ namespace CasterUnitCore
             return true;
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
             if (_capeThermoMaterial != null && _capeThermoMaterial.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoMaterial);
+                Marshal.ReleaseComObject(_capeThermoMaterial);
             if (_capeThermoCompounds != null && _capeThermoCompounds.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoCompounds);
+                Marshal.ReleaseComObject(_capeThermoCompounds);
             if (_capeThermoEquilibriumRoutine != null && _capeThermoEquilibriumRoutine.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoEquilibriumRoutine);
+                Marshal.ReleaseComObject(_capeThermoEquilibriumRoutine);
             if (_capeThermoMaterialContext != null && _capeThermoMaterialContext.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoMaterialContext);
+                Marshal.ReleaseComObject(_capeThermoMaterialContext);
             if (_capeThermoPhases != null && _capeThermoPhases.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoPhases);
+                Marshal.ReleaseComObject(_capeThermoPhases);
             if (_capeThermoPropertyRoutine != null && _capeThermoPropertyRoutine.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoPropertyRoutine);
+                Marshal.ReleaseComObject(_capeThermoPropertyRoutine);
             if (_capeThermoUniversalConstant != null && _capeThermoUniversalConstant.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoUniversalConstant);
+                Marshal.ReleaseComObject(_capeThermoUniversalConstant);
             _capeThermoMaterial = null;
             _capeThermoMaterialContext = null;
             _capeThermoPhases = null;

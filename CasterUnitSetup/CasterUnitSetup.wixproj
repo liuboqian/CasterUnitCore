@@ -14,7 +14,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug;CasterUnitCore=..\;CasterUnitCoreDebug=..\CasterUnitCore\bin\Debug\;CasterFlash=..\..\CasterFlash;;</DefineConstants>
+    <DefineConstants>Debug;CasterCore=..\..\Bin\Debug\; CasterFlash=..\..\CasterFlash;;</DefineConstants>
     <WixVariables />
     <Cultures />
   </PropertyGroup>

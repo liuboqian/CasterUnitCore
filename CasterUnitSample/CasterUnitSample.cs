@@ -16,6 +16,7 @@ using System;
 using System.Runtime.InteropServices;
 using CasterUnitCore;
 using CAPEOPEN;
+using CasterCore;
 
 namespace CasterUnitSample
 {
@@ -29,7 +30,8 @@ namespace CasterUnitSample
     [CapeVendorURL("")]
     [CapeVersion("1.1")]
     [ComDefaultInterface(typeof(ICapeUnit))]
-    public class CasterUnitSample : CasterUnitOperationBase, ICapeUnit
+    public class CasterUnitSample :
+        CasterUnitOperationBase, ICapeUnit
     {
         public CasterUnitSample()
             : base(new TestCalculator(), "CasterUnitSample", "This unit is a test to the CasterUnitCore.")
@@ -47,7 +49,7 @@ namespace CasterUnitSample
             Parameters.Add(ParamP);
 
             Parameters.Add(new CapeIntParameter("intParam", CapeParamMode.CAPE_INPUT));
-            Parameters.Add(new CapeBooleanParameter("boolParam", true, CapeParamMode.CAPE_INPUT));
+            Parameters.Add(new CapeBooleanParameter("boolParam", CapeParamMode.CAPE_INPUT));
             Parameters.Add(new CapeOptionParameter("optionParam", typeof(Options), CapeParamMode.CAPE_INPUT));
         }
 
@@ -69,9 +71,8 @@ namespace CasterUnitSample
             Results.Add(ParamPout);
 
             Results.Add(new CapeIntParameter("intParam", CapeParamMode.CAPE_OUTPUT));
-            Results.Add(new CapeBooleanParameter("boolParam", true, CapeParamMode.CAPE_OUTPUT));
+            Results.Add(new CapeBooleanParameter("boolParam", CapeParamMode.CAPE_OUTPUT));
             Results.Add(new CapeOptionParameter("optionParam", typeof(Options), CapeParamMode.CAPE_OUTPUT));
-
         }
     }
 }

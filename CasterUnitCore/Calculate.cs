@@ -14,6 +14,7 @@
 
 using System;
 using System.Reflection;
+using CasterCore;
 
 namespace CasterUnitCore
 {

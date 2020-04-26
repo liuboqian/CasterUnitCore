@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CasterUnitCore;
 using CAPEOPEN;
+using CasterCore;
 
 namespace CasterUnitSample
 {
@@ -47,8 +48,8 @@ namespace CasterUnitSample
             //double b = collections.Work;
             //Initialize the output Parameters
             //Warning!! For Parameters, do not use ParamTout=ParamT, use the value property
-            ParamT = ((CapeRealParameter)UnitOp.Parameters["T"]).value;
-            ParamP = ((CapeRealParameter)UnitOp.Parameters["P"]).value;
+            ParamT = ((CapeRealParameter)UnitOp.Parameters["T"]).SIValue;
+            ParamP = ((CapeRealParameter)UnitOp.Parameters["P"]).SIValue;
         }
 
         public override void Calculate()

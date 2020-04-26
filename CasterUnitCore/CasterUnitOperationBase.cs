@@ -22,11 +22,12 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows;
-using CAPEOPEN;
 using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CasterUnitCore.Reports;
+using CasterCore;
+using CAPEOPEN;
 
 namespace CasterUnitCore
 {
@@ -39,8 +40,10 @@ namespace CasterUnitCore
     [ComVisible(true)]
     [ComDefaultInterface(typeof(ICapeUnit))]
     [Guid("E78BFCC3-4865-4AF5-8BEE-276C49DE506F")]
-    public abstract class CasterUnitOperationBase
-        : CapeOpenBaseObject, ICapeUnit, ICapeUtilities, ICapeUnitReport, IPersistStream  //The origin CAPE-OPEN IPersistStream has a problem, so overload it
+    public abstract class CasterUnitOperationBase :
+        CapeOpenBaseObject,
+        ICapeUnit, ICapeUtilities,
+        ICapeUnitReport, CasterCore.IPersistStream  //The origin CAPE-OPEN IPersistStream has a problem, so overload it
     {
         #region fields
 
@@ -118,7 +121,7 @@ namespace CasterUnitCore
         /// <paramCollection name="className">name of this unit operation</paramCollection>
         /// <paramCollection name="description">description of this unit operation</paramCollection>
         public CasterUnitOperationBase(Calculator specCalculator, string className, string description)
-            : base(className, description, true)
+            : base(className, description, true,true)
         {
             Debug.WriteLine("UnitOperation Initializing.");
 
@@ -306,9 +309,7 @@ namespace CasterUnitCore
         public virtual void Initialize()
         {
             Debug.WriteLine("Initialize");
-
-            CasterUnitLocator.Register(UnitId, this);
-
+            
             //Is bad to use virtual method here, but considering that I have create three instances above, so it works for now.
             try
             {
@@ -333,11 +334,11 @@ namespace CasterUnitCore
             {
                 Debug.WriteLine("Initialize Failed.");
                 throw new ECapeUnknownException(this,
-                    "UnitOperation Initialize Failed.",
+                    "UnitOperation Initialize Failed." + e.Message,
                     e);
             }
-            
-            OnInitialize?.Invoke(this,EventArgs.Empty);
+
+            OnInitialize?.Invoke(this, EventArgs.Empty);
 
             Debug.WriteLine("Initialize Completed.");
         }
@@ -348,7 +349,7 @@ namespace CasterUnitCore
         public virtual void Terminate()
         {
             Debug.WriteLine("Terminate");
-            OnTerminate?.Invoke(this,EventArgs.Empty);
+            OnTerminate?.Invoke(this, EventArgs.Empty);
 
             if (simulationContext != null && simulationContext.GetType().IsCOMObject)
                 Marshal.FinalReleaseComObject(simulationContext);
@@ -357,8 +358,6 @@ namespace CasterUnitCore
             {
                 ((CapeUnitPortBase)port.Value).Disconnect();
             }
-
-            CasterUnitLocator.UnRegister(UnitId);
 
             Debug.WriteLine("Terminate Done.");
         }
@@ -405,7 +404,7 @@ namespace CasterUnitCore
         {
             get
             {
-                OnGetParameters?.Invoke(this,Parameters);
+                OnGetParameters?.Invoke(this, Parameters);
                 return Parameters;
             }
         }
@@ -571,7 +570,7 @@ namespace CasterUnitCore
             Marshal.ReleaseComObject(pStm);
             MemoryStream memoryStream = new MemoryStream(numArray);
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            binaryFormatter.Binder = new UBinder();
+            //binaryFormatter.Binder = new UBinder();
             try
             {
                 object[] objArray = binaryFormatter.Deserialize(memoryStream) as object[];
@@ -626,6 +625,7 @@ namespace CasterUnitCore
 
         /// <summary>
         /// register function, no need to modify, the information will get through the Attribute of UnitOp class
+        /// For registry, run regasm xxx.dll, then run regasm xxx.dll /tlb xxx.tlb /codebase
         /// </summary>
         /// <paramCollection name="t"></paramCollection>
         [ComRegisterFunction]

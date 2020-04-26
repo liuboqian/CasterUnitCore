@@ -9,17 +9,18 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CasterUnitCore</RootNamespace>
     <AssemblyName>CasterUnitCore</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\Bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -48,9 +49,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CAPE-OPENv1-1-0, Version=1.1.0.0, Culture=neutral, PublicKeyToken=10a1040e6624c81d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\packages\CAPE-OPENv1-1-0.dll</HintPath>
+    </Reference>
+    <Reference Include="CasterCore">
+      <HintPath>..\..\Bin\Debug\CasterCore.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -68,21 +70,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\CapeCategoryAttribute.cs" />
-    <Compile Include="Attributes\CapeHelpURLAttribute.cs" />
-    <Compile Include="Attributes\CapeAboutAttribute.cs" />
-    <Compile Include="Attributes\CapeDescriptionAttribute.cs" />
-    <Compile Include="Attributes\CapeVendorURLAttribute.cs" />
-    <Compile Include="Attributes\CapeVersionAttribute.cs" />
-    <Compile Include="Attributes\CapeNameAttribute.cs" />
-    <Compile Include="Base\CapeCollection.cs" />
-    <Compile Include="Base\CapeCollectionPair.cs" />
-    <Compile Include="Base\CapeOpenBaseObject.cs" />
     <Compile Include="Calculate.cs" />
-    <Compile Include="CasterUnitLocator.cs" />
     <Compile Include="CasterUnitOperationBase.cs" />
-    <Compile Include="Exceptions\ECapeErrorHResult.cs" />
-    <Compile Include="Exceptions\ECapeUnknownException.cs" />
     <Compile Include="GUI\MainViewModel.cs" />
     <Compile Include="GUI\ParameterModel.cs" />
     <Compile Include="GUI\ParameterTemplateSelector.cs" />
@@ -92,17 +81,6 @@
     <Compile Include="GUI\ViewModelLocator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Persist\IPersistStream.cs" />
-    <Compile Include="Parameters\CapeArrayParameter.cs" />
-    <Compile Include="Parameters\CapeBooleanParameter.cs" />
-    <Compile Include="Parameters\CapeIntParameter.cs" />
-    <Compile Include="Parameters\CapeMatrixParameter.cs" />
-    <Compile Include="Parameters\CapeOptionParameter.cs" />
-    <Compile Include="Parameters\CapeParameterBase.cs" />
-    <Compile Include="Parameters\CapeRealParameter.cs" />
-    <Compile Include="Parameters\Units.cs" />
-    <Compile Include="Parameters\UnitCategoryEnum.cs" />
-    <Compile Include="Persist\UBinder.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -120,8 +98,6 @@
     <Compile Include="Reports\LastRunReport.cs" />
     <Compile Include="Reports\ReportBase.cs" />
     <Compile Include="Reports\StatusReport.cs" />
-    <Compile Include="SimulationContext\CapeCOSEUtilities.cs" />
-    <Compile Include="SimulationContext\CapeMaterialTemplateSystem.cs" />
     <Compile Include="Streams\CapeEnergyPort.cs" />
     <Compile Include="Streams\CapeInformationPort.cs" />
     <Compile Include="Streams\CapeMaterialPort.cs" />
@@ -129,10 +105,6 @@
     <Compile Include="Streams\MaterialObject.cs" />
     <Compile Include="Streams\MaterialObject10.cs" />
     <Compile Include="Streams\MaterialObject11.cs" />
-    <Compile Include="Streams\Phases.cs" />
-    <Compile Include="Streams\PropertyBasis.cs" />
-    <Compile Include="Streams\PropertyCategory.cs" />
-    <Compile Include="SimulationContext\CapeDiagnostic.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -144,16 +116,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Parameters\unitCategory.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Parameters\unit.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Page Include="GUI\ParameterWindow.xaml">

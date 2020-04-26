@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CasterUnitCore.Annotations;
 using CAPEOPEN;
+using CasterCore;
 
 namespace CasterUnitCore
 {
@@ -38,7 +39,7 @@ namespace CasterUnitCore
                 if (ParamType == CapeParamType.CAPE_REAL)
                 {
                     CapeRealParameter realParam = Parameter as CapeRealParameter;
-                    return Units.UnitConvert(CurrentUnit, realParam.value,
+                    return Units.UnitConvert(CurrentUnit, realParam.DoubleValue,
                         Units.GetSIUnit(realParam.CurrentUnitCategory),
                         realParam.CurrentUnitCategory).ToString();
                 }
@@ -61,7 +62,7 @@ namespace CasterUnitCore
                     catch (Exception)
                     {
                         CapeRealParameter realParam = Parameter as CapeRealParameter;
-                        realParam.value=double.NaN;
+                        realParam.value = double.NaN;
                     }
                 }
                 else if (ParamType == CapeParamType.CAPE_INT)
@@ -109,7 +110,7 @@ namespace CasterUnitCore
             get
             {
                 CapeRealParameter realParam = Parameter as CapeRealParameter;
-                IEnumerable<string> a = Units.GetUnitList(realParam.CurrentUnitCategory); 
+                IEnumerable<string> a = Units.GetUnitList(realParam.CurrentUnitCategory);
                 return Units.GetUnitList(realParam.CurrentUnitCategory);
             }
         }

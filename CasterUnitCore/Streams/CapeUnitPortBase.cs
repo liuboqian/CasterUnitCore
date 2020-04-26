@@ -15,6 +15,7 @@
 using System;
 using CAPEOPEN;
 using System.Runtime.InteropServices;
+using CasterCore;
 
 namespace CasterUnitCore
 {

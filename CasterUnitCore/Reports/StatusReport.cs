@@ -16,6 +16,9 @@ namespace CasterUnitCore.Reports
 
             UnitOp.Validate(ref report);
 
+            if (string.IsNullOrWhiteSpace(report))
+                report = "Complete.";
+
             return report;
         }
     }

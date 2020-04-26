@@ -19,6 +19,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using CAPEOPEN;
+using CasterCore;
 
 namespace CasterUnitCore
 {
@@ -113,10 +114,10 @@ namespace CasterUnitCore
             return true;
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
             if (_capeThermoMaterialObject != null && _capeThermoMaterialObject.GetType().IsCOMObject)
-                Marshal.FinalReleaseComObject(_capeThermoMaterialObject);
+                Marshal.ReleaseComObject(_capeThermoMaterialObject);
             //if (_capeThermoPropertyPackage != null && _capeThermoPropertyPackage.GetType().IsCOMObject)
             //    Marshal.FinalReleaseComObject(_capeThermoPropertyPackage);
             _capeThermoMaterialObject = null;
