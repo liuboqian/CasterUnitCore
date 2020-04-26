@@ -24,7 +24,7 @@ using CAPEOPEN;
 namespace CasterCore
 {
     /// <summary>
-    /// a function used to filter parameters, same as Func&lt;ICapeIdentification,bool&gt;
+    /// a function used to filter parameters, same as Func<ICapeIdentification,bool>;
     /// </summary>
     public delegate bool ValidateFunc(ICapeIdentification item);
 
@@ -41,11 +41,7 @@ namespace CasterCore
         /// <summary>
         /// contains items with a key
         /// </summary>
-        protected Dictionary<string, ICapeIdentification> _items = new Dictionary<string, ICapeIdentification>();
-        /// <summary>
-        /// contains keys in the order when it was added
-        /// </summary>
-        protected List<string> _keys = new List<string>();
+        protected SortedDictionary<string, ICapeIdentification> _items = new SortedDictionary<string, ICapeIdentification>();
         //the value is keeped both in keys and index, makes it possible to access through index or its name
         /// <summary>
         /// Validation for insert value
@@ -68,7 +64,7 @@ namespace CasterCore
             : base(name, description, canRename)
         {
             IsReadOnly = false;
-            this.constraint = constraint as ValidateFunc;
+            this.constraint = constraint;
         }
 
         #endregion
@@ -108,7 +104,7 @@ namespace CasterCore
             {
                 try
                 {
-                    return this._items[_keys[index]];
+                    return this._items.ElementAt(index).Value;
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
@@ -121,7 +117,8 @@ namespace CasterCore
             {
                 try
                 {
-                    this._items[_keys[index]] = value;
+                    var pair = this._items.ElementAt(index);
+                    this._items[pair.Key] = value;
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
@@ -164,15 +161,14 @@ namespace CasterCore
         /// </summary>
         public CapeCollectionPair GetItem(int index)
         {
-            if (index < 0 || index >= _keys.Count)
+            if (index < 0 || index >= _items.Count)
                 throw new ECapeUnknownException(this,
                         $"Index not avaliable, start from zero. Count: {Count}, Wanted {index}",
                         null, "ICapeCollection");
-
-            return new CapeCollectionPair(_keys[index], _items[_keys[index]]);
+            return new CapeCollectionPair(_items.ElementAt(index).Key, _items.ElementAt(index).Value);
         }
 
-        int ICapeCollection.Count() => _keys.Count;
+        int ICapeCollection.Count() => _items.Count;
 
         #endregion
 
@@ -183,10 +179,7 @@ namespace CasterCore
         /// </summary>
         public IEnumerator<CapeCollectionPair> GetEnumerator()
         {
-            var sortedList = new List<CapeCollectionPair>(Count);
-            for (int i = 0; i < Count; i++)
-                sortedList.Add(new CapeCollectionPair(_keys[i], this[_keys[i]]));
-            return sortedList.GetEnumerator();
+            return _items.Select(pair => new CapeCollectionPair()).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -226,7 +219,6 @@ namespace CasterCore
             if (_items.ContainsKey(key))
                 throw new ECapeUnknownException(this,
                     $"This collection already has an item with the same key: <{key}>.");
-            _keys.Add(key);
             _items.Add(key, item);
         }
 
@@ -235,7 +227,6 @@ namespace CasterCore
         /// </summary>
         public void Clear()
         {
-            _keys.Clear();
             _items.Clear();
         }
 
@@ -243,9 +234,8 @@ namespace CasterCore
         /// contains an item with the same key
         /// </summary>
         public bool Contains(CapeCollectionPair item)
-            => _items.Contains(
-                new KeyValuePair<string, ICapeIdentification>(item.Key, item.Value));
-        
+            => _items.ContainsKey(item.Key) && _items[item.Key] == item.Value;
+
         /// <summary>
         /// whether CapeCollection contains this item
         /// </summary>
@@ -256,7 +246,7 @@ namespace CasterCore
         /// whether CapeCollection contains item with this key
         /// </summary>
         public bool Contains(string key)
-            => _keys.Contains(key);
+            => _items.ContainsKey(key);
 
         /// <summary>
         /// Copy the dictionary to an array of CapeCollectionPair, ordered by insertion sequence 
@@ -265,7 +255,10 @@ namespace CasterCore
         {
             var sortedList = new CapeCollectionPair[Count];
             for (int i = 0; i < Count; i++)
-                sortedList[i] = new CapeCollectionPair(_keys[i], this[_keys[i]]);
+            {
+                var pair = _items.ElementAt(i);
+                sortedList[i] = new CapeCollectionPair(pair.Key, pair.Value);
+            }
             sortedList.CopyTo(array, arrayIndex);
         }
 
@@ -284,8 +277,7 @@ namespace CasterCore
         /// </summary>
         public bool Remove(string key)
         {
-            if (!_keys.Contains(key)) return false;
-            _keys.Remove(key);
+            if (!Contains(key)) return false;
             _items.Remove(key);
             return true;
         }
@@ -296,9 +288,8 @@ namespace CasterCore
         {
             string key = (from p in _items
                           where p.Value.Equals(item)
-                          select p.Key).First();
+                          select p.Key).SingleOrDefault();
             if (key == null) return false;
-            _keys.Remove(key);
             _items.Remove(key);
             return true;
         }
@@ -306,7 +297,7 @@ namespace CasterCore
         /// <summary>
         /// Number of this collection
         /// </summary>
-        public int Count => _keys.Count;
+        public int Count => _items.Count;
 
         /// <summary>
         /// Is the collection immutable, always false
@@ -316,7 +307,7 @@ namespace CasterCore
         /// <summary>
         /// return item keys, in inserting order
         /// </summary>
-        public string[] Keys => _keys.ToArray();
+        public string[] Keys => _items.Select(p => p.Key).ToArray();
 
         /// <summary>
         /// Return item array, without key
@@ -325,12 +316,7 @@ namespace CasterCore
         {
             get
             {
-                ICapeIdentification[] array = new ICapeIdentification[Count];
-                for (int i = 0; i < Count; i++)
-                {
-                    array[i] = _items[_keys[i]];
-                }
-                return array;
+                return _items.Select(p => p.Value).ToArray();
             }
         }
 
@@ -345,10 +331,9 @@ namespace CasterCore
         {
             CapeCollection newCollection = new CapeCollection(this.ComponentName,
                 this.ComponentDescription, this.constraint, this.CanRename);
-            foreach (var key in _keys)
+            foreach (var pair in _items)
             {
-                newCollection._keys.Add(key);
-                newCollection._items.Add(key, ((CapeOpenBaseObject)this._items[key]).Clone() as ICapeIdentification);
+                newCollection.Add(pair.Key, pair.Value);
             }
             return newCollection;
         }

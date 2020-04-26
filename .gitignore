@@ -9,15 +9,25 @@
 
 # Build results
 [Dd]ebug/
+*/[Dd]ebug/
 [Dd]ebugPublic/
+*/[Dd]ebugPublic/
 [Rr]elease/
+*/[Rr]elease/
 [Rr]eleases/
+*/[Rr]eleases/
 x64/
+*/x64/
 x86/
+*/x86/
 build/
+*/build/
 bld/
+*/bld/
 [Bb]in/
+*/[Bb]in/
 [Oo]bj/
+*/[Oo]bj/
 
 # Roslyn cache directories
 *.ide/

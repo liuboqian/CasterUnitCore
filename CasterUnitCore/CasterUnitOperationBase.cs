@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using CasterUnitCore.Reports;
 using CasterCore;
 using CAPEOPEN;
+using System.Runtime.CompilerServices;
 
 namespace CasterUnitCore
 {
@@ -60,7 +61,7 @@ namespace CasterUnitCore
         /// </summary>
         protected bool Isloaded;
         /// <summary>
-        /// new thread to show GUI, important for aspen
+        /// new thread to show GUI, important for aspen plus
         /// </summary>
         protected Thread GuiThread;
         /// <summary>
@@ -121,9 +122,10 @@ namespace CasterUnitCore
         /// <paramCollection name="className">name of this unit operation</paramCollection>
         /// <paramCollection name="description">description of this unit operation</paramCollection>
         public CasterUnitOperationBase(Calculator specCalculator, string className, string description)
-            : base(className, description, true,true)
+            : base(className, description, true, true)
         {
-            Debug.WriteLine("UnitOperation Initializing.");
+            Logger.Info($"UnitOperation {className} Initializing.");
+            Debug.WriteLine($"UnitOperation {className} Initializing.");
 
             this.SpecCalculator = specCalculator;
             SpecCalculator.UnitOp = this;
@@ -148,6 +150,7 @@ namespace CasterUnitCore
 
             Reports = new List<ReportBase>();
 
+            Logger.Info("UnitOperation Initialize Completed.");
             Debug.WriteLine("UnitOperation Initialize Completed.");
         }
 
@@ -176,8 +179,10 @@ namespace CasterUnitCore
         /// </summary>
         public virtual void InitReports()
         {
+            Logger.Info("Init reports");
             Reports.Add(new StatusReport());
             Reports.Add(new LastRunReport());
+            Logger.Info("Finish init reports");
         }
 
         /// <summary> 
@@ -185,6 +190,7 @@ namespace CasterUnitCore
         /// </summary>
         protected virtual bool ParamtersValidate(out string message)
         {
+            Logger.Info("ParamtersValidate");
             bool valid = true;
             message = "";
             foreach (var parameter in Parameters)
@@ -196,8 +202,16 @@ namespace CasterUnitCore
                     valid = false;
                 }
             }
-            if (valid) return true;
-            else return false;
+            if (valid)
+            {
+                Logger.Info("Parameter valid.");
+                return true;
+            }
+            else
+            {
+                Logger.Info("Parameter invalid. Msg: " + message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -205,6 +219,7 @@ namespace CasterUnitCore
         /// </summary>
         protected virtual bool PortsValidate(out string message)
         {
+            Logger.Info("PortsValidate");
             bool hasInlet = false;
             bool hasOutlet = false;
             message = "";
@@ -218,9 +233,16 @@ namespace CasterUnitCore
                     hasOutlet = true;
             }
             if (!hasInlet)
-                message = "Inlet material is not connected.";
-            else if (!hasOutlet)
-                message = "Outlet material is not connected.";
+            {
+                Logger.Info("Inlet material is not connected.");
+                message += "Inlet material is not connected.";
+            }
+            if (!hasOutlet)
+            {
+                Logger.Info("Inlet material is not connected.");
+                message += "Outlet material is not connected.";
+            }
+            Logger.Info("PortsValidate result: " + (hasInlet && hasOutlet));
             return hasInlet && hasOutlet;
         }
 
@@ -229,6 +251,7 @@ namespace CasterUnitCore
         /// </summary>
         protected void UpdateCompoundList()
         {
+            Logger.Info("UpdateCompoundList");
             foreach (var item in Ports)
             {
                 CapeMaterialPort p = item.Value as CapeMaterialPort;
@@ -246,12 +269,19 @@ namespace CasterUnitCore
         /// </summary>
         public virtual void Calculate()
         {
+            Logger.Info("Calculate");
+
             UpdateCompoundList();
+            Logger.Info("BeforeCalculate");
             SpecCalculator.BeforeCalculate();
             CapeDiagnostic.LogMessage("{0} : Calculate Start.", ComponentName);
+            Logger.Info("Calculate");
             SpecCalculator.Calculate();
             CapeDiagnostic.LogMessage("{0} : Calculate Complete.", ComponentName);
+            Logger.Info("OutputResult");
             SpecCalculator.OutputResult();
+
+            Logger.Info("Calculate Completed");
         }
 
         /// <summary>
@@ -260,6 +290,8 @@ namespace CasterUnitCore
         /// <paramCollection name="message">return the combined error message</paramCollection>
         public virtual bool Validate(ref string message)
         {
+            Logger.Info("Validate");
+
             string parameterMessage = null;
             string portMessage = null;
 
@@ -273,9 +305,13 @@ namespace CasterUnitCore
 
             message = "" + parameterMessage + '\n' + portMessage;
             if (Status == CapeValidationStatus.CAPE_VALID)
+            {
+                Logger.Info("Validate success.");
                 return true;
+            }
             else
             {
+                Logger.InfoFormatted("Validate fails. {0}", message);
                 Debug.WriteLine("Validate fails. {0}", message);
                 return false;
             }
@@ -308,23 +344,29 @@ namespace CasterUnitCore
         /// </summary>
         public virtual void Initialize()
         {
+            Logger.Info("Initialize");
             Debug.WriteLine("Initialize");
-            
+
             //Is bad to use virtual method here, but considering that I have create three instances above, so it works for now.
             try
             {
+                Logger.Info("Start Initialize Parameters.");
                 Debug.WriteLine("Start Initialize Parameters.");
                 InitParameters();
 
+                Logger.Info("Start Initialize Ports.");
                 Debug.WriteLine("Start Initialize Ports.");
                 InitPorts();
 
+                Logger.Info("Start Initialize Results.");
                 Debug.WriteLine("Start Initialize Results.");
                 InitResults();
 
+                Logger.Info("Start Initialize Reports.");
                 Debug.WriteLine("Start Initialize Reports.");
                 InitReports();
 
+                Logger.Info("Start SetUnitOp");
                 foreach (var report in Reports)
                 {
                     report.SetUnitOp(this);
@@ -332,12 +374,14 @@ namespace CasterUnitCore
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Initialize Failed.");
+                Logger.Info("Initialize Failed: "+ e.Message);
+                Debug.WriteLine("Initialize Failed: " + e.Message);
                 throw new ECapeUnknownException(this,
                     "UnitOperation Initialize Failed." + e.Message,
                     e);
             }
 
+            Logger.Info("OnInitialize");
             OnInitialize?.Invoke(this, EventArgs.Empty);
 
             Debug.WriteLine("Initialize Completed.");
@@ -348,17 +392,21 @@ namespace CasterUnitCore
         /// </summary>
         public virtual void Terminate()
         {
+            Logger.Info("Terminate");
             Debug.WriteLine("Terminate");
             OnTerminate?.Invoke(this, EventArgs.Empty);
 
+            Logger.Info("Start Release COM object");
             if (simulationContext != null && simulationContext.GetType().IsCOMObject)
                 Marshal.FinalReleaseComObject(simulationContext);
 
             foreach (var port in Ports)
             {
                 ((CapeUnitPortBase)port.Value).Disconnect();
+                ((CapeUnitPortBase)port.Value).Dispose();
             }
 
+            Logger.Info("Terminate Done.");
             Debug.WriteLine("Terminate Done.");
         }
 
@@ -367,6 +415,7 @@ namespace CasterUnitCore
         /// </summary>
         public int Edit()
         {
+            Logger.Info("Edit.");
             Debug.WriteLine("Edit");
             if (GuiThread != null && GuiThread.IsAlive)
                 return 0;     //if not abort, return 0
@@ -385,7 +434,8 @@ namespace CasterUnitCore
         [STAThread]
         protected virtual void OpenEditWindow()
         {
-            ParameterWindow paramWindow = new ParameterWindow(this, (CapeCollection)Parameters, (CapeCollection)Results);
+            Logger.Info("OpenEditWindow");
+            ParameterWindow paramWindow = new ParameterWindow(this, Parameters, Results);
             if (paramWindow.ShowDialog() == true)
             {
                 //foreach (var param in paramWindow.ViewModel.Parameters)
@@ -395,6 +445,7 @@ namespace CasterUnitCore
             }
             GuiThread.DisableComObjectEagerCleanup();
             GuiThread.Abort();
+            Logger.Info("OpenEditWindow");
         }
 
         /// <summary>
@@ -430,7 +481,9 @@ namespace CasterUnitCore
 
         public virtual void ProduceReport(ref string message)
         {
+            Logger.Info("ProduceReport");
             message = SelectedReportObj?.ProduceReport();
+            Logger.Info("ProduceReport Complete");
         }
 
         dynamic ICapeUnitReport.reports =>
@@ -515,6 +568,7 @@ namespace CasterUnitCore
         /// </summary>
         public virtual void Save(IStream pStm, [MarshalAs(UnmanagedType.U1)]bool fClearDirty)
         {
+            Logger.Info("Save");
             byte[] pv1 = new byte[2];
             object[] objArray = new object[5];
             objArray[0] = this.ComponentName;
@@ -550,9 +604,12 @@ namespace CasterUnitCore
             }
             catch (Exception ex)
             {
+                Logger.Info("Save Failed: "+ ex.Message);
                 MessageBox.Show(ex.ToString());
                 Marshal.ReleaseComObject(pStm);
             }
+            Logger.Info("Save Success");
+            Logger.Info("Save");
         }
 
         /// <summary>
@@ -560,6 +617,7 @@ namespace CasterUnitCore
         /// </summary>
         public virtual void Load(IStream pStm)
         {
+            Logger.Info("Load");
             this.Isloaded = true;
             byte[] pv = new byte[2];
             IntPtr pcbRead = IntPtr.Zero;
@@ -614,8 +672,10 @@ namespace CasterUnitCore
             }
             catch (Exception ex)
             {
+                Logger.Info("Load failed: "+ ex.Message);
                 MessageBox.Show(ex.ToString());
             }
+            Logger.Info("Load success");
             memoryStream.Close();
         }
 
@@ -631,113 +691,9 @@ namespace CasterUnitCore
         [ComRegisterFunction]
         public static void RegisterFunction(Type t)
         {
-            string progId = "";
-            string className = "";
-            string description = "";
-            string progIdVersionIndenpent = "";
-            string capeVersion = "";
-            string about = "";
-            string vendorURL = "";
-            string helpURL = "";
-            string componentVersion = "";
-            List<Guid> categoryGUIDs = new List<Guid>();
-            //Get attribute like CapeName
-            Assembly assembly = t.Assembly;
-            foreach (var attribute in t.GetCustomAttributes(false))
-            {
-                progIdVersionIndenpent = attribute is CapeNameAttribute ? ((CapeNameAttribute)attribute).Name : progIdVersionIndenpent;
-                description = attribute is CapeDescriptionAttribute ? ((CapeDescriptionAttribute)attribute).Description : description;
-                capeVersion = attribute is CapeVersionAttribute ? ((CapeVersionAttribute)attribute).Version : capeVersion;
-                about = attribute is CapeAboutAttribute ? ((CapeAboutAttribute)attribute).About : about;
-                vendorURL = attribute is CapeVendorURLAttribute ? ((CapeVendorURLAttribute)attribute).VendorURL : vendorURL;
-                helpURL = attribute is CapeHelpURLAttribute ? ((CapeHelpURLAttribute)attribute).HelpURL : helpURL;
-                if (attribute is CapeCategoryAttribute)
-                    categoryGUIDs.Add(((CapeCategoryAttribute)attribute).GUID);
-            }
-            className = t.ToString();
-            if (progIdVersionIndenpent == "") progIdVersionIndenpent = t.Namespace;
-            componentVersion = t.Assembly.GetName().Version.ToString();
-            progId = progIdVersionIndenpent + capeVersion;
-            //progID
-            RegistryKey keyProgID = Registry.ClassesRoot.CreateSubKey(progId);
-            try
-            {
-                keyProgID.SetValue(null, className, RegistryValueKind.String);
-                RegistryKey subKey = keyProgID.CreateSubKey("CLSID");
-                subKey.SetValue(null, t.GUID.ToString("B"));
-                subKey.Close();
-            }
-            catch (System.Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
-            keyProgID.Close();
-            //versionIndenpentProgID
-            RegistryKey keyProgIDVersionIndenpent = Registry.ClassesRoot.CreateSubKey(progIdVersionIndenpent);
-            try
-            {
-                keyProgIDVersionIndenpent.SetValue(null, className, RegistryValueKind.String);
-                RegistryKey subKey = keyProgIDVersionIndenpent.CreateSubKey("CLSID");
-                subKey.SetValue(null, t.GUID.ToString("B"));
-                subKey.Close();
-                subKey = keyProgIDVersionIndenpent.CreateSubKey("CurVer");
-                subKey.SetValue(null, progId);
-                subKey.Close();
-            }
-            catch (System.Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
-            keyProgIDVersionIndenpent.Close();
-            //CLSID
-            RegistryKey keyCLSID = Registry.ClassesRoot.OpenSubKey("CLSID", true);
-            try
-            {
-                keyCLSID = keyCLSID.CreateSubKey(t.GUID.ToString("B"));
-                keyCLSID.SetValue(null, className);
-
-                RegistryKey subKey;
-
-                subKey = keyCLSID.CreateSubKey("ProgID");
-                subKey.SetValue(null, progId);
-                subKey.Close();
-
-                subKey = keyCLSID.CreateSubKey("VersionIndependentProgID");
-                subKey.SetValue(null, progIdVersionIndenpent);
-                subKey.Close();
-
-                subKey = keyCLSID.CreateSubKey("AppID");
-                subKey.SetValue(null, progId);
-                subKey.Close();
-
-                subKey = keyCLSID.CreateSubKey("TypeLib");
-                subKey.SetValue(null, "{7f43b3e5-bf70-4a59-97fc-4ff7641066ae}");
-                subKey.Close();
-
-                subKey = keyCLSID.CreateSubKey("Implemented Categories");
-                subKey.CreateSubKey("{678C09A5-7D66-11D2-A67D-00105A42887F}");
-                subKey.CreateSubKey("{678C09A1-7D66-11D2-A67D-00105A42887F}");
-                foreach (var guid in categoryGUIDs)
-                    subKey.CreateSubKey(guid.ToString("B"));
-                subKey.Close();
-
-                subKey = keyCLSID.CreateSubKey("CapeDescription");
-                subKey.SetValue("Name", progIdVersionIndenpent);
-                subKey.SetValue("Description", description);
-                subKey.SetValue("CapeVersion", capeVersion);
-                subKey.SetValue("ComponentVersion", componentVersion);
-                subKey.SetValue("VendorURL", vendorURL);
-                subKey.SetValue("HelpURL", helpURL);
-                subKey.SetValue("About", about);
-                subKey.Close();
-
-                keyCLSID.Close();
-            }
-            catch (System.Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
-            keyCLSID.Close();
+            Logger.Info("Register component: " + t.FullName);
+            CapeOpenCOMRegister.RegisterFunction(t);
+            Logger.Info("Register component complete");
         }
 
         /// <summary>
@@ -747,36 +703,11 @@ namespace CasterUnitCore
         [ComUnregisterFunction]
         public static void UnRegisterFunction(Type t)
         {
-            string progId = "";
-            string progIdVersionIndenpent = "";
-            string capeVersion = "";
-            Assembly assembly = t.Assembly;
-            foreach (var attribute in t.GetCustomAttributes(false))
-            {
-                progIdVersionIndenpent = attribute is CapeNameAttribute ? ((CapeNameAttribute)attribute).Name : progIdVersionIndenpent;
-                capeVersion = attribute is CapeVersionAttribute ? ((CapeVersionAttribute)attribute).Version : capeVersion;
-            }
-            progId = progIdVersionIndenpent + capeVersion;
-            //MessageBox.Show("Delete");
-            Registry.ClassesRoot.DeleteSubKeyTree(progId, false);
-            Registry.ClassesRoot.DeleteSubKeyTree(progIdVersionIndenpent, false);
-            Registry.ClassesRoot.OpenSubKey("CLSID", true).DeleteSubKeyTree(t.GUID.ToString("B"), false);
+            Logger.Info("Unregister component: " + t.FullName);
+            CapeOpenCOMRegister.UnRegisterFunction(t);
+            Logger.Info("Unregister component complete");
         }
 
         #endregion
-
-        //#region IClonable
-
-        //public override object Clone()
-        //{
-        //    return new CasterUnitOperationBase((SpecCalculator)this.SpecCalculator.Clone(),this.ComponentName,this.ComponentDescription)
-        //    {
-        //        _canRename = this._canRename,
-        //        _dirty = this._dirty,
-        //        _isloaded = this._isloaded
-        //    };
-        //}
-
-        //#endregion
     }
 }

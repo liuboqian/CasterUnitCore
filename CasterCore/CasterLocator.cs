@@ -33,6 +33,7 @@ namespace CasterCore
         public static void Register(CapeOpenBaseObject component)
         {
             string name = component.ComponentName;
+            Logger.Info($"Register component {name}.");
             if (_components.ContainsKey(name))
             {
                 if (_components[name] == component)
@@ -50,6 +51,7 @@ namespace CasterCore
         /// </summary>
         public static void UnRegister(string name)
         {
+            Logger.Info($"UnRegister component {name}.");
             if (!_components.ContainsKey(name))
                 throw new ECapeUnknownException(
                     $"UnRegister Failed : Key \"{name}\" is not registered.");
@@ -63,6 +65,7 @@ namespace CasterCore
         public static void UnRegister(CapeOpenBaseObject component)
         {
             string name = component.ComponentName;
+            Logger.Info($"UnRegister component {name}.");
             if (!_components.ContainsKey(name))
                 return;
             //throw new ECapeUnknownException(
@@ -152,6 +155,7 @@ namespace CasterCore
         /// </summary>
         public static void Clear()
         {
+            Logger.Info("CasterLocator clear");
             _components.Clear();
         }
     }

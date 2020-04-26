@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Documents;
 using CAPEOPEN;
 using CasterCore;
 
@@ -60,9 +61,11 @@ namespace CasterUnitCore
         /// </summary>
         public void Destroy()
         {
+            Logger.Info("Material Destory.");
             Dispose();
+            Logger.Info("Material Destoryed.");
         }
-   
+
         /// <summary>
         /// Duplicate this material, it is the only way to create a new material object
         /// </summary>
@@ -88,16 +91,21 @@ namespace CasterUnitCore
         /// <returns></returns>
         public bool SetMaterial(MaterialObject material)
         {
-            return SetMaterial((object)material);
+            Logger.Info("SetMaterial");
+            var result = SetMaterial((object)material);
+            Logger.Info("SetMaterial "+ (result? "successed." : "failed."));
+            return result;
         }
-  
+
         /// <summary>
         /// Release COM resources, 这个类融合以后要移除
         /// </summary>
         public void Dispose()
         {
+            Logger.Info("Material Dispose");
             Dispose(true);
             GC.SuppressFinalize(this);
+            Logger.Info("Material Disposed");
         }
 
         /// <summary>
@@ -206,7 +214,7 @@ namespace CasterUnitCore
         }
      
         /// <summary>
-        /// get alloed phases, always used to get actual phase name in diffent software
+        /// get alloed phases, always use this to get actual phase name in diffent software
         /// </summary>
         public Phases[] AllowedPhases
         {
@@ -326,20 +334,23 @@ namespace CasterUnitCore
         /// </summary>
         public double GetOverallPropDouble(string propName, PropertyBasis basis)
         {
-            return GetOverallPropList(propName, basis).SingleOrDefault();
+            Logger.Info($"GetOverallPropDouble for {propName}");
+            return GetOverallPropList(propName, basis).Single();
         }
 
         /// <summary>
         /// get overall property, return a double array, if result is a single number, will return a single element array
         /// </summary>
-        public abstract double[] GetOverallPropList(string propName, PropertyBasis basis);
+        public abstract double[] GetOverallPropList(string propName, PropertyBasis basis, bool calculate = false);
 
         /// <summary>
         /// set overall property
         /// </summary>
         public void SetOverallPropDouble(string propName, PropertyBasis basis, double value)
         {
+            Logger.Info($"SetOverallPropDouble for {propName}, value is {value}");
             SetOverallPropList(propName, basis, new[] { value });
+            Logger.Info($"SetOverallPropDouble completed.");
         }
 
         /// <summary>
@@ -348,26 +359,89 @@ namespace CasterUnitCore
         /// <paramCollection name="value">the value to be set, MUST be IEnumerable double, if you want to set other data structure, use the raw interface</paramCollection>
         public abstract void SetOverallPropList(string propName, PropertyBasis basis, IEnumerable<double> value);
 
-        /// <summary>
-        /// overall temperature
-        /// </summary>
-        public abstract double T { get; set; }
 
-        /// <summary>
-        /// overall pressure
-        /// </summary>
-        public abstract double P { get; set; }
+        public double T
+        {
+            get
+            {
+                return GetOverallPropDouble("temperature", PropertyBasis.Undefined);
+            }
+            set
+            {
+                SetOverallPropDouble("temperature", PropertyBasis.Undefined, value);
+            }
+        }
 
-        /// <summary>
-        /// overall totalflow, mole basis
-        /// </summary>
-        public abstract double TotalFlow { get; set; }
+        public double P
+        {
+            get
+            {
+                return GetOverallPropDouble("pressure", PropertyBasis.Undefined);
+            }
+            set
+            {
+                SetOverallPropDouble("pressure", PropertyBasis.Undefined, value);
+            }
+        }
 
-        /// <summary>
-        /// Overall composition, mole basis
-        /// If you set a partial composition with some compounds is not in the dict, the method will take them as 0.
-        /// </summary>
-        public abstract Dictionary<string, double> Composition { get; set; }
+        public double TotalFlow
+        {
+            get
+            {
+                return GetOverallPropDouble("totalFlow", PropertyBasis.Mole);
+            }
+            set
+            {
+                SetOverallPropDouble("totalFlow", PropertyBasis.Mole, value);
+            }
+        }
+
+        public double VaporFraction
+        {
+            get
+            {
+                return GetOverallPropDouble("phaseFraction", PropertyBasis.Mole);
+            }
+            set
+            {
+                //如果没有气相
+                try
+                {
+                    SetSinglePhasePropDouble("phaseFraction", Phases.Vapor, PropertyBasis.Mole, value);
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorFormatted("Set vapor fraction fails. {0}", e.Message);
+                    Debug.WriteLine("Set vapor fraction fails. {0}", e.Message);
+                }
+            }
+        }
+
+        public Dictionary<string, double> Composition
+        {
+            get
+            {
+                var composition = new Dictionary<string, double>();
+                var compoundList = Compounds;
+                var value = GetOverallPropList("fraction", PropertyBasis.Mole);
+                double[] compositionList = value as double[];
+                for (int i = 0; i < compoundList.Length; i++)
+                {
+                    composition.Add(compoundList[i], compositionList[i]);
+                }
+                return composition;
+            }
+            set
+            {
+                double[] composition = new double[CompoundNum];
+                for (int i = 0; i < CompoundNum; i++)
+                {
+                    if (!value.TryGetValue(Compounds[i], out composition[i]))
+                        Logger.Error($"No composition for {Compounds[i]}");
+                }
+                SetOverallPropList("fraction", PropertyBasis.Mole, composition);
+            }
+        }
 
         /// <summary>
         /// overall composition, mole basis
@@ -392,11 +466,6 @@ namespace CasterUnitCore
                 Composition = flow;
             }
         }
-
-        /// <summary>
-        /// fraction of vapor phase, mole basis
-        /// </summary>
-        public abstract double VaporFraction { get; set; }
 
         /// <summary>
         /// overall enthalpy, unit is J/s
@@ -521,18 +590,23 @@ namespace CasterUnitCore
         /// </summary>
         public double GetSinglePhasePropDouble(string propName, Phases phase, PropertyBasis basis, bool calculate = true)
         {
+            Logger.Info($"GetSinglePhasePropDouble for {propName} in {phase} Calculate: {calculate}");
             if (PresentPhases.All(p => p.Value != phase.Value)) return 0;
-            return GetSinglePhasePropList(propName, phase, basis, calculate).SingleOrDefault();
+            var result = GetSinglePhasePropList(propName, phase, basis, calculate).SingleOrDefault();
+            Logger.Info($"GetSinglePhasePropDouble result: {result}");
+            return result;
         }
-   
+
         /// <summary>
         /// set single pahse property
         /// </summary>
         public void SetSinglePhasePropDouble(string propName, Phases phase, PropertyBasis basis, double value)
         {
+            Logger.Info($"SetSinglePhasePropDouble for {propName} in {phase}: {value}");
             SetSinglePhasePropList(propName, phase, basis, new[] { value });
+            Logger.Info($"SetSinglePhasePropDouble completed.");
         }
-    
+
         /// <summary>
         /// get single phase flow
         /// </summary>
@@ -548,14 +622,12 @@ namespace CasterUnitCore
         {
             var composition = new Dictionary<string, double>();
             var compoundList = Compounds;
-            object value = null;
             double[] compositionList = GetSinglePhasePropList("fraction", phase, basis);
             for (int i = 0; i < compoundList.Length; i++)
             {
                 composition.Add(compoundList[i], compositionList[i]);
             }
             return composition;
-
         }
      
         /// <summary>
@@ -605,24 +677,29 @@ namespace CasterUnitCore
         /// </summary>
         public double GetTwoPhasePropDouble(string propName, Phases phase1, Phases phase2, PropertyBasis basis, bool calculate = true)
         {
+            Logger.Info($"GetTwoPhasePropDouble {propName} for {phase1} and {phase2}, calculate: {calculate}");
             if (PresentPhases.All(p => p.Value != phase1.Value)
                 || PresentPhases.All(p => p.Value != phase2.Value))
                 return 0;
-            return GetTwoPhasePropList(propName, phase1, phase2, basis, calculate).SingleOrDefault();
+            var result = GetTwoPhasePropList(propName, phase1, phase2, basis, calculate).SingleOrDefault();
+            Logger.Info($"GetTwoPhasePropDouble result: {result}");
+            return result;
         }
-    
+
         /// <summary>
         /// set two phase property
         /// </summary>
         public void SetTwoPhasePropDouble(string propName, Phases phase1, Phases phase2, PropertyBasis basis, double value)
         {
+            Logger.Info($"SetTwoPhasePropDouble {propName} for {phase1} and {phase2}, {value}");
             SetTwoPhasePropList(propName, phase1, phase2, basis, new[] { value });
+            Logger.Info($"SetTwoPhasePropDouble completed");
         }
 
         #endregion
 
         #region Constant Property & T-Dependent Property & P-Dependent Property & Universal Constant
-     
+
         /// <summary>
         /// get all available constant property, unavailable for CO1.0 
         /// </summary>
@@ -691,6 +768,7 @@ namespace CasterUnitCore
         /// <returns></returns>
         public string SearchPropName(PropertyCategory category, string possibleName, string defaultName = null)
         {
+            Logger.Info($"SearchPropName for {possibleName}");
             string propName = null;
             try
             {
@@ -709,11 +787,13 @@ namespace CasterUnitCore
             }
             catch (Exception)
             {
+            Logger.InfoFormatted("Property {0} not found, use {1}", possibleName, defaultName);
                 Debug.WriteLine("Property {0} not found, use {1}", possibleName, defaultName);
             }
             if (propName == null)
             {
                 propName = defaultName ?? possibleName;
+                Logger.InfoFormatted("Property {0} not found, use {1}", possibleName, defaultName);
                 Debug.WriteLine("Property {0} not found, use {1}", possibleName, propName);
             }
             return propName;
@@ -726,5 +806,5 @@ namespace CasterUnitCore
 
         #endregion
 
-    }//类结尾
+    }
 }

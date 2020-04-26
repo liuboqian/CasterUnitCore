@@ -21,7 +21,7 @@ namespace CasterUnitCore
     /// <summary>
     /// This class is the base class for all calculate class, must be inherit, and should also inherit the specified unit calculate interface
     /// </summary>
-    public abstract class Calculator : ICloneable
+    public abstract class Calculator
     {
         #region fields
         /// <summary>
@@ -37,6 +37,7 @@ namespace CasterUnitCore
         /// </summary>
         protected Calculator()
         {
+            Logger.Info("Calculator is created");
         }
         #endregion
 
@@ -57,18 +58,6 @@ namespace CasterUnitCore
         /// Output result, set material to Ports, set results to Results, and clear up material
         /// </summary>
         public abstract void OutputResult();
-
-        #endregion
-
-        #region ICloneable
-
-        /// <summary>
-        /// In most case, this method is used to provide a duplicate Parameters to GUI, so just copy the Parameters and Results
-        /// </summary>
-        public virtual object Clone()
-        {
-            throw new NotImplementedException();
-        }
 
         #endregion
 

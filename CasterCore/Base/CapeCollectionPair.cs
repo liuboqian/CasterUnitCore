@@ -13,28 +13,20 @@
 * limitations under the License.*/
 
 using System;
+using System.Collections.Generic;
 using CAPEOPEN;
 
 namespace CasterCore
 {
     /// <summary>
-    /// Similar to KeyValuePair of Dictionary, the class is used to return pairs in CapeCollection
+    /// Similar to KeyValuePair of Dictionary, the class is used to return pairs in CapeCollection, index is useless if not in collection
     /// </summary>
     [Serializable]
     public struct CapeCollectionPair
     {
-        /// <summary>
-        /// Key of component in CapeCollection, a string
-        /// </summary>
         public string Key;
-        /// <summary>
-        /// Value of component in CapeCollection, a CapeOpenBaseObject
-        /// </summary>
         public ICapeIdentification Value;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public CapeCollectionPair(string key, ICapeIdentification value)
         {
             if (key == null)

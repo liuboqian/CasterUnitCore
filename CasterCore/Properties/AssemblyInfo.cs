@@ -37,3 +37,5 @@ using System.Runtime.InteropServices;
 
 ////To be used by other .net language
 //[assembly: System.CLSCompliant(true)]
+
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", ConfigFileExtension = "config", Watch = true)]

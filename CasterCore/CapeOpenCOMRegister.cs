@@ -142,6 +142,7 @@ namespace CasterCore
             {
                 MessageBox.Show(e.Message);
             }
+            Console.WriteLine($"Complete write to {keyCLSID.ToString()}");
             keyCLSID.Close();
         }
 
