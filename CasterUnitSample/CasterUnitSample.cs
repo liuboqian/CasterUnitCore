@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using CasterUnitCore;
 using CAPEOPEN;
 using CasterCore;
+using System.Linq;
 
 namespace CasterUnitSample
 {
@@ -39,6 +40,12 @@ namespace CasterUnitSample
 
         public override void InitParameters()
         {
+            if(Parameters == null || Parameters.Count == 0)
+            {
+                Logger.Info("Parameters is not empty, skip InitParameters");
+                return;
+            }
+            Logger.Info("InitParameters");
             CapeRealParameter ParamT = new CapeRealParameter("T", UnitCategoryEnum.Temperature,
                 CapeParamMode.CAPE_INPUT, defaultVal: 500);
             ParamT.ComponentDescription = "temperature of outlet material";
@@ -51,18 +58,22 @@ namespace CasterUnitSample
             Parameters.Add(new CapeIntParameter("intParam", CapeParamMode.CAPE_INPUT));
             Parameters.Add(new CapeBooleanParameter("boolParam", CapeParamMode.CAPE_INPUT));
             Parameters.Add(new CapeOptionParameter("optionParam", typeof(Options), CapeParamMode.CAPE_INPUT));
+            Logger.Info("InitParameters completed");
         }
 
         public override void InitPorts()
         {
+            Logger.Info("InitPorts");
             Ports.Add(new CapeMaterialPort("feed", CapePortDirection.CAPE_INLET, "Inlet Material"));
             Ports.Add(new CapeMaterialPort("product", CapePortDirection.CAPE_OUTLET, "Outlet Material"));
             //Ports.Add(new CapeEnergyPort("energy", CapePortDirection.CAPE_INLET));
             //Ports.Add(new CapeInformationPort("info", CapePortDirection.CAPE_INLET));
+            Logger.Info("InitPorts completed");
         }
 
         public override void InitResults()
         {
+            Logger.Info("InitResults");
             CapeRealParameter ParamTout = new CapeRealParameter("Tout", UnitCategoryEnum.Temperature, CapeParamMode.CAPE_OUTPUT);
             ParamTout.ComponentDescription = "temperature of actual outlet material";
             Results.Add(ParamTout);
@@ -73,6 +84,7 @@ namespace CasterUnitSample
             Results.Add(new CapeIntParameter("intParam", CapeParamMode.CAPE_OUTPUT));
             Results.Add(new CapeBooleanParameter("boolParam", CapeParamMode.CAPE_OUTPUT));
             Results.Add(new CapeOptionParameter("optionParam", typeof(Options), CapeParamMode.CAPE_OUTPUT));
+            Logger.Info("InitResults completed");
         }
     }
 }

@@ -38,6 +38,7 @@ namespace CasterUnitCore
         protected CapeUnitPortBase(string name, CapePortType type, CapePortDirection portDirection, string description = "", bool canRename = false)
             : base(name, description, canRename)
         {
+            Logger.Info($"Create unit port {name}, type is {type}, direction is {portDirection}");
             _portDirection = portDirection;
             _portType = type;
         }

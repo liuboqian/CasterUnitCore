@@ -36,7 +36,7 @@ namespace CasterCore
     [Guid("7D9B4745-1510-4BCD-B7CF-87DE6796AD23")]
     [ComDefaultInterface(typeof(ICapeCollection))]
     public class CapeCollection :
-        CapeOpenBaseObject, ICapeCollection, ICollection<CapeCollectionPair>
+        CapeOpenBaseObject, ICapeCollection, ICollection<CapeCollectionPair>, ICloneable
     {
         /// <summary>
         /// contains items with a key
@@ -327,7 +327,7 @@ namespace CasterCore
         /// <summary>
         /// if the item inside the CapeCollection is not CapeOpenBaseObject or never implement Clone(), the method will fail
         /// </summary>
-        public override object Clone()
+        public object Clone()
         {
             CapeCollection newCollection = new CapeCollection(this.ComponentName,
                 this.ComponentDescription, this.constraint, this.CanRename);

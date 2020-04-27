@@ -24,7 +24,7 @@ namespace CasterCore
     [Serializable]
     [ComVisible(true)]
     public abstract class CapeOpenBaseObject :
-        ICapeIdentification, ICloneable, IDisposable,
+        ICapeIdentification, IDisposable,
         ECapeRoot, ECapeUnknown, ECapeUser
     {
         private string _name; //ComponentName
@@ -107,20 +107,6 @@ namespace CasterCore
         /// whether the component has been modified
         /// </summary>
         public bool Dirty { get; set; }
-
-        #endregion
-
-        #region ICloneable
-
-        /// <summary>
-        /// Not Implemented, each derived class should override this
-        /// </summary>
-        public virtual object Clone()
-        {
-            throw new ECapeUnknownException(this,
-                $"{ComponentName} have not implemented ICloneable interface.",
-                new NotImplementedException(), typeof(ICloneable).ToString());
-        }
 
         #endregion
 

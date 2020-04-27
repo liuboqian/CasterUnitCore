@@ -44,6 +44,7 @@ namespace CasterUnitCore
         /// </summary>
         public override void Connect(object objectToConnect)
         {
+            Logger.Info($"Port {this.ComponentName} is connecting");
             Disconnect();
             if (objectToConnect is ICapeThermoMaterial)
             {
@@ -54,14 +55,20 @@ namespace CasterUnitCore
                 _materialObject = new MaterialObject10(objectToConnect);
             }
             else
-                throw new ECapeUnknownException(this,"object connected to material port must be ICapeThermoMaterial or ICapeThermoMaterialObject");
+            {
+                Logger.Error("object connected to material port must be ICapeThermoMaterial or ICapeThermoMaterialObject");
+                throw new ECapeUnknownException(this, "object connected to material port must be ICapeThermoMaterial or ICapeThermoMaterialObject");
+            }
+            Logger.Info($"Port {this.ComponentName} connected.");
         }
 
         public override void Disconnect()
         {
-            if(_materialObject!=null)
+            Logger.Info($"Port {this.ComponentName} is disconnecting");
+            if (_materialObject!=null)
                 _materialObject.Dispose();
             _materialObject = null;
+            Logger.Info($"Port {this.ComponentName} is disconnected.");
         }
 
         /// <summary>
@@ -95,12 +102,12 @@ namespace CasterUnitCore
             set { Connect(value.CapeThermoMaterialObject); }
         }
 
-        public override object Clone()
-        {
-            return new CapeMaterialPort(ComponentName, _portDirection, ComponentDescription, CanRename)
-            {
-                _materialObject = _materialObject,
-            };
-        }
+        //public override object Clone()
+        //{
+        //    return new CapeMaterialPort(ComponentName, _portDirection, ComponentDescription, CanRename)
+        //    {
+        //        _materialObject = _materialObject,
+        //    };
+        //}
     }
 }

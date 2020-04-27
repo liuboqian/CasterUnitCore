@@ -50,6 +50,7 @@ namespace CasterUnitCore
         /// </summary>
         public override void Connect(object objectToConnect)
         {
+            Logger.Info($"Port {this.ComponentName} is connecting");
             Disconnect();
             if (objectToConnect is ICapeCollection)
             {
@@ -57,13 +58,16 @@ namespace CasterUnitCore
             }
             else
                 throw new ECapeUnknownException(this,"object connected to information port must be ICapeCollection");
+            Logger.Info($"Port {this.ComponentName} connected.");
         }
 
         public override void Disconnect()
         {
+            Logger.Info($"Port {this.ComponentName} is disconnecting");
             if (paramCollection != null && paramCollection.GetType().IsCOMObject)
                 Marshal.FinalReleaseComObject(paramCollection);
             paramCollection = null;
+            Logger.Info($"Port {this.ComponentName} disconnected.");
         }
 
         /// <summary>
@@ -80,15 +84,6 @@ namespace CasterUnitCore
         public override bool IsConnected()
         {
             return paramCollection != null;
-        }
-
-
-        public override object Clone()
-        {
-            return new CapeInformationPort(ComponentName, _portDirection, ComponentDescription, CanRename)
-            {
-                paramCollection = paramCollection
-            };
         }
 
         #endregion

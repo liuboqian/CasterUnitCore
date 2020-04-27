@@ -27,7 +27,7 @@ namespace CasterCore
     [ComDefaultInterface(typeof(ICapeParameter))]
     public abstract class CapeParameterBase :
         CapeOpenBaseObject,
-        ICapeParameter, ICapeParameterSpec
+        ICapeParameter, ICapeParameterSpec, ICloneable
     {
         /// <summary>
         /// default name is "parameter", default type is CAPE_REAL
@@ -122,5 +122,7 @@ namespace CasterCore
         {
             return $"{ComponentName}: {value}";
         }
+
+        public abstract object Clone();
     }
 }
