@@ -86,5 +86,25 @@ namespace CasterUnitSample
             Results.Add(new CapeOptionParameter("optionParam", typeof(Options), CapeParamMode.CAPE_OUTPUT));
             Logger.Info("InitResults completed");
         }
+
+        [ComRegisterFunction]
+        public static void RegisterFunction(Type t)
+        {
+            Logger.Info("Register component: " + t.FullName);
+            CapeOpenCOMRegister.RegisterFunction(t);
+            Logger.Info("Register component complete");
+        }
+
+        /// <summary>
+        /// Unregister function
+        /// </summary>
+        /// <paramCollection name="t"></paramCollection>
+        [ComUnregisterFunction]
+        public static void UnRegisterFunction(Type t)
+        {
+            Logger.Info("Unregister component: " + t.FullName);
+            CapeOpenCOMRegister.UnRegisterFunction(t);
+            Logger.Info("Unregister component complete");
+        }
     }
 }

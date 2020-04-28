@@ -683,30 +683,30 @@ namespace CasterUnitCore
 
         #region Register
 
-        /// <summary>
-        /// register function, no need to modify, the information will get through the Attribute of UnitOp class
-        /// For registry, run regasm xxx.dll, then run regasm xxx.dll /tlb xxx.tlb /codebase
-        /// </summary>
-        /// <paramCollection name="t"></paramCollection>
-        [ComRegisterFunction]
-        public static void RegisterFunction(Type t)
-        {
-            Logger.Info("Register component: " + t.FullName);
-            CapeOpenCOMRegister.RegisterFunction(t);
-            Logger.Info("Register component complete");
-        }
+        ///// <summary>
+        ///// register function, no need to modify, the information will get through the Attribute of UnitOp class
+        ///// For registry, run regasm xxx.dll, then run regasm xxx.dll /tlb xxx.tlb /codebase
+        ///// </summary>
+        ///// <paramCollection name="t"></paramCollection>
+        //[ComRegisterFunction]
+        //public static void RegisterFunction(Type t)
+        //{
+        //    Logger.Info("Register component: " + t.FullName);
+        //    CapeOpenCOMRegister.RegisterFunction(t);
+        //    Logger.Info("Register component complete");
+        //}
 
-        /// <summary>
-        /// Unregister function
-        /// </summary>
-        /// <paramCollection name="t"></paramCollection>
-        [ComUnregisterFunction]
-        public static void UnRegisterFunction(Type t)
-        {
-            Logger.Info("Unregister component: " + t.FullName);
-            CapeOpenCOMRegister.UnRegisterFunction(t);
-            Logger.Info("Unregister component complete");
-        }
+        ///// <summary>
+        ///// Unregister function
+        ///// </summary>
+        ///// <paramCollection name="t"></paramCollection>
+        //[ComUnregisterFunction]
+        //public static void UnRegisterFunction(Type t)
+        //{
+        //    Logger.Info("Unregister component: " + t.FullName);
+        //    CapeOpenCOMRegister.UnRegisterFunction(t);
+        //    Logger.Info("Unregister component complete");
+        //}
 
         #endregion
     }
