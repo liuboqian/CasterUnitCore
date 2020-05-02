@@ -179,7 +179,7 @@ namespace CasterCore
         /// </summary>
         public IEnumerator<CapeCollectionPair> GetEnumerator()
         {
-            return _items.Select(pair => new CapeCollectionPair()).GetEnumerator();
+            return _items.Select(pair => new CapeCollectionPair(pair.Key, pair.Value)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

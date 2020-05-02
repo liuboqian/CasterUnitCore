@@ -40,7 +40,7 @@ namespace CasterUnitSample
 
         public override void InitParameters()
         {
-            if(Parameters == null || Parameters.Count == 0)
+            if(Parameters != null && Parameters.Count != 0)
             {
                 CasterLogger.Debug("Parameters is not empty, skip InitParameters");
                 return;
