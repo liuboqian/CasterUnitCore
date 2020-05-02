@@ -77,9 +77,6 @@
     <Reference Include="CAPE-OPENv1-1-0, Version=1.1.0.0, Culture=neutral, PublicKeyToken=10a1040e6624c81d, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="CasterCore">
-      <HintPath>..\..\Bin\Debug\CasterCore.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -176,6 +173,12 @@
     <PackageReference Include="log4net">
       <Version>2.0.8</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CasterCore\CasterCore.csproj">
+      <Project>{085cf196-265c-4070-a00c-edc10ccb5d71}</Project>
+      <Name>CasterCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

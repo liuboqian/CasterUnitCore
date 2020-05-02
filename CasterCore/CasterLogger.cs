@@ -1,25 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using log4net;
+using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 
 namespace CasterCore
 {
-    public static class Logger
+    public static class CasterLogger
     {
         private static ILog log;
 
-        static Logger()
+        static CasterLogger()
         {
-            log = LogManager.GetLogger("CasterCore");
+            var assembly = typeof(CasterLogger).Assembly;
+            var directory = Path.GetDirectoryName(assembly.Location);
+            var configPath = Path.Combine(directory, "log4net.config");
+            if (File.Exists(configPath))
+            {
+                log4net.GlobalContext.Properties["CasterLogFolder"] = directory;
+                XmlConfigurator.ConfigureAndWatch(new FileInfo(configPath));
+            }
+            else
+            {
+                XmlConfigurator.Configure();
+            }
+            log = LogManager.GetLogger(typeof(CasterLogger));
+        }
+
+        public static void Shutdown()
+        {
+            LogManager.Shutdown();
         }
 
         public static void Debug(string msg)
         {
+            //var file = LogManager.GetRepository().GetAppenders().FirstOrDefault() as FileAppender;
+            //MessageBox.Show(file.File, "test");
             log.Debug(msg);
         }
 

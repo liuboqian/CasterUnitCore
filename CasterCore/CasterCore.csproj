@@ -95,7 +95,6 @@
     <Compile Include="Base\CapeCollection.cs" />
     <Compile Include="Base\CapeCollectionPair.cs" />
     <Compile Include="Base\CapeOpenBaseObject.cs" />
-    <Compile Include="CapeOpenCOMRegister.cs" />
     <Compile Include="CasterLocator.cs" />
     <Compile Include="Enums\Phases.cs" />
     <Compile Include="Enums\PropertyBasis.cs" />
@@ -103,7 +102,7 @@
     <Compile Include="Exceptions\ECapeErrorHResult.cs" />
     <Compile Include="Exceptions\ECapeUnknownException.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="CasterLogger.cs" />
     <Compile Include="Parameters\CapeArrayParameter.cs" />
     <Compile Include="Parameters\CapeBooleanParameter.cs" />
     <Compile Include="Parameters\CapeIntParameter.cs" />

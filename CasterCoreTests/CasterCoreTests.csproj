@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Base\CapeCollectionTests.cs" />
     <Compile Include="CasterLocatorTests.cs" />
+    <Compile Include="LoggerTests.cs" />
     <Compile Include="Parameters\CapeBooleanParameterTests.cs" />
     <Compile Include="Parameters\CapeIntParameterTests.cs" />
     <Compile Include="Parameters\CapeOptionParameterTests.cs" />

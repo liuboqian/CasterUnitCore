@@ -44,7 +44,7 @@ namespace CasterCore
         {
             if (_diagnostic != null)
                 _diagnostic.PopUpMessage(string.Format(msg, args));
-            Logger.DebugFormatted("Popup: " + msg, args);
+            CasterLogger.DebugFormatted("Popup: " + msg, args);
             Debug.WriteLine(string.Format(msg, args));
         }
 
@@ -56,7 +56,7 @@ namespace CasterCore
         {
             if (_diagnostic != null)
                 _diagnostic.LogMessage(string.Format(msg, args));
-            Logger.DebugFormatted(msg, args);
+            CasterLogger.DebugFormatted(msg, args);
             Debug.WriteLine(string.Format(msg, args));
         }
     }

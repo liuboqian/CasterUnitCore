@@ -61,9 +61,9 @@ namespace CasterUnitCore
         /// </summary>
         public void Destroy()
         {
-            Logger.Info("Material Destory.");
+            CasterLogger.Debug("Material Destory.");
             Dispose();
-            Logger.Info("Material Destoryed.");
+            CasterLogger.Debug("Material Destoryed.");
         }
 
         /// <summary>
@@ -91,21 +91,21 @@ namespace CasterUnitCore
         /// <returns></returns>
         public bool SetMaterial(MaterialObject material)
         {
-            Logger.Info("SetMaterial");
+            CasterLogger.Debug("SetMaterial");
             var result = SetMaterial((object)material);
-            Logger.Info("SetMaterial "+ (result? "successed." : "failed."));
+            CasterLogger.Debug("SetMaterial "+ (result? "successed." : "failed."));
             return result;
         }
 
         /// <summary>
-        /// Release COM resources, 这个类融合以后要移除
+        /// Release COM resources
         /// </summary>
         public void Dispose()
         {
-            Logger.Info("Material Dispose");
+            CasterLogger.Debug("Material Dispose");
             Dispose(true);
             GC.SuppressFinalize(this);
-            Logger.Info("Material Disposed");
+            CasterLogger.Debug("Material Disposed");
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace CasterUnitCore
         /// </summary>
         public double GetOverallPropDouble(string propName, PropertyBasis basis)
         {
-            Logger.Info($"GetOverallPropDouble for {propName}");
+            CasterLogger.Debug($"GetOverallPropDouble for {propName}");
             return GetOverallPropList(propName, basis).Single();
         }
 
@@ -348,9 +348,9 @@ namespace CasterUnitCore
         /// </summary>
         public void SetOverallPropDouble(string propName, PropertyBasis basis, double value)
         {
-            Logger.Info($"SetOverallPropDouble for {propName}, value is {value}");
+            CasterLogger.Debug($"SetOverallPropDouble for {propName}, value is {value}");
             SetOverallPropList(propName, basis, new[] { value });
-            Logger.Info($"SetOverallPropDouble completed.");
+            CasterLogger.Debug($"SetOverallPropDouble completed.");
         }
 
         /// <summary>
@@ -411,7 +411,7 @@ namespace CasterUnitCore
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorFormatted("Set vapor fraction fails. {0}", e.Message);
+                    CasterLogger.ErrorFormatted("Set vapor fraction fails. {0}", e.Message);
                     Debug.WriteLine("Set vapor fraction fails. {0}", e.Message);
                 }
             }
@@ -437,7 +437,7 @@ namespace CasterUnitCore
                 for (int i = 0; i < CompoundNum; i++)
                 {
                     if (!value.TryGetValue(Compounds[i], out composition[i]))
-                        Logger.Error($"No composition for {Compounds[i]}");
+                        CasterLogger.Error($"No composition for {Compounds[i]}");
                 }
                 SetOverallPropList("fraction", PropertyBasis.Mole, composition);
             }
@@ -590,10 +590,10 @@ namespace CasterUnitCore
         /// </summary>
         public double GetSinglePhasePropDouble(string propName, Phases phase, PropertyBasis basis, bool calculate = true)
         {
-            Logger.Info($"GetSinglePhasePropDouble for {propName} in {phase} Calculate: {calculate}");
+            CasterLogger.Debug($"GetSinglePhasePropDouble for {propName} in {phase} Calculate: {calculate}");
             if (PresentPhases.All(p => p.Value != phase.Value)) return 0;
             var result = GetSinglePhasePropList(propName, phase, basis, calculate).SingleOrDefault();
-            Logger.Info($"GetSinglePhasePropDouble result: {result}");
+            CasterLogger.Debug($"GetSinglePhasePropDouble result: {result}");
             return result;
         }
 
@@ -602,9 +602,9 @@ namespace CasterUnitCore
         /// </summary>
         public void SetSinglePhasePropDouble(string propName, Phases phase, PropertyBasis basis, double value)
         {
-            Logger.Info($"SetSinglePhasePropDouble for {propName} in {phase}: {value}");
+            CasterLogger.Debug($"SetSinglePhasePropDouble for {propName} in {phase}: {value}");
             SetSinglePhasePropList(propName, phase, basis, new[] { value });
-            Logger.Info($"SetSinglePhasePropDouble completed.");
+            CasterLogger.Debug($"SetSinglePhasePropDouble completed.");
         }
 
         /// <summary>
@@ -677,12 +677,12 @@ namespace CasterUnitCore
         /// </summary>
         public double GetTwoPhasePropDouble(string propName, Phases phase1, Phases phase2, PropertyBasis basis, bool calculate = true)
         {
-            Logger.Info($"GetTwoPhasePropDouble {propName} for {phase1} and {phase2}, calculate: {calculate}");
+            CasterLogger.Debug($"GetTwoPhasePropDouble {propName} for {phase1} and {phase2}, calculate: {calculate}");
             if (PresentPhases.All(p => p.Value != phase1.Value)
                 || PresentPhases.All(p => p.Value != phase2.Value))
                 return 0;
             var result = GetTwoPhasePropList(propName, phase1, phase2, basis, calculate).SingleOrDefault();
-            Logger.Info($"GetTwoPhasePropDouble result: {result}");
+            CasterLogger.Debug($"GetTwoPhasePropDouble result: {result}");
             return result;
         }
 
@@ -691,9 +691,9 @@ namespace CasterUnitCore
         /// </summary>
         public void SetTwoPhasePropDouble(string propName, Phases phase1, Phases phase2, PropertyBasis basis, double value)
         {
-            Logger.Info($"SetTwoPhasePropDouble {propName} for {phase1} and {phase2}, {value}");
+            CasterLogger.Debug($"SetTwoPhasePropDouble {propName} for {phase1} and {phase2}, {value}");
             SetTwoPhasePropList(propName, phase1, phase2, basis, new[] { value });
-            Logger.Info($"SetTwoPhasePropDouble completed");
+            CasterLogger.Debug($"SetTwoPhasePropDouble completed");
         }
 
         #endregion
@@ -768,7 +768,7 @@ namespace CasterUnitCore
         /// <returns></returns>
         public string SearchPropName(PropertyCategory category, string possibleName, string defaultName = null)
         {
-            Logger.Info($"SearchPropName for {possibleName}");
+            CasterLogger.Debug($"SearchPropName for {possibleName}");
             string propName = null;
             try
             {
@@ -787,13 +787,13 @@ namespace CasterUnitCore
             }
             catch (Exception)
             {
-            Logger.InfoFormatted("Property {0} not found, use {1}", possibleName, defaultName);
+            CasterLogger.DebugFormatted("Property {0} not found, use {1}", possibleName, defaultName);
                 Debug.WriteLine("Property {0} not found, use {1}", possibleName, defaultName);
             }
             if (propName == null)
             {
                 propName = defaultName ?? possibleName;
-                Logger.InfoFormatted("Property {0} not found, use {1}", possibleName, defaultName);
+                CasterLogger.DebugFormatted("Property {0} not found, use {1}", possibleName, defaultName);
                 Debug.WriteLine("Property {0} not found, use {1}", possibleName, propName);
             }
             return propName;

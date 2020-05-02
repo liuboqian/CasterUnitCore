@@ -37,7 +37,7 @@ namespace CasterUnitCore
         /// </summary>
         protected Calculator()
         {
-            Logger.Info("Calculator is created");
+            CasterLogger.Debug("Calculator is created");
         }
         #endregion
 

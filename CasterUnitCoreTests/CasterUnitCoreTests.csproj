@@ -80,6 +80,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CasterCore\CasterCore.csproj">
+      <Project>{085CF196-265C-4070-A00C-EDC10CCB5D71}</Project>
+      <Name>CasterCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CasterUnitCore\CasterUnitCore.csproj">
       <Project>{59193795-6B7E-4149-8572-D03A525B8CD1}</Project>
       <Name>CasterUnitCore</Name>

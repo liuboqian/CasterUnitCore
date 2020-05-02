@@ -41,7 +41,7 @@ namespace CasterUnitSample
 
         public override void BeforeCalculate()
         {
-            Logger.Info("BeforeCalculate");
+            CasterLogger.Debug("BeforeCalculate");
             //Get material connected to this unit
             inputMaterial = ((CapeMaterialPort)UnitOp.Ports["feed"]).Material.Duplicate();
             outputMaterial = inputMaterial.Duplicate();
@@ -51,12 +51,12 @@ namespace CasterUnitSample
             //Warning!! For Parameters, do not use ParamTout=ParamT, use the value property
             ParamT = ((CapeRealParameter)UnitOp.Parameters["T"]).SIValue;
             ParamP = ((CapeRealParameter)UnitOp.Parameters["P"]).SIValue;
-            Logger.Info($"Calculation Parameters: T {ParamT} P {ParamP}");
+            CasterLogger.Debug($"Calculation Parameters: T {ParamT} P {ParamP}");
         }
 
         public override void Calculate()
         {
-            Logger.Info("Calculate");
+            CasterLogger.Debug("Calculate");
             //throw new ECapeUnknownException(UnitOp,"Test");
 
             #region Flash
@@ -119,13 +119,13 @@ namespace CasterUnitSample
 
             //#endregion
 
-            Logger.Info("Calculate complete");
+            CasterLogger.Debug("Calculate complete");
             return;
         }
 
         public override void OutputResult()
         {
-            Logger.Info("OutputResult");
+            CasterLogger.Debug("OutputResult");
             ((CapeRealParameter)UnitOp.Results["Tout"]).value = outputMaterial.T;
             ((CapeRealParameter)UnitOp.Results["Pout"]).value = outputMaterial.P;
 
@@ -139,7 +139,7 @@ namespace CasterUnitSample
             //Clear Reference
             inputMaterial.Destroy();
             outputMaterial.Destroy();
-            Logger.Info("OutputResult completed");
+            CasterLogger.Debug("OutputResult completed");
         }
 
         #endregion

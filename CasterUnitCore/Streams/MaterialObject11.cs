@@ -51,16 +51,16 @@ namespace CasterUnitCore
         public MaterialObject11()
             : this(null)
         {
-            Logger.Info("Create empty MaterialObject11");
+            CasterLogger.Debug("Create empty MaterialObject11");
         }
         /// <summary>
         /// create a MaterialObject11 connected to object, should only be invoked by CapeUnitPortBase
         /// </summary>
         public MaterialObject11(object objectToConnect)
         {
-            Logger.Info("Create MaterialObject11 with a material");
+            CasterLogger.Debug("Create MaterialObject11 with a material");
             SetMaterial(objectToConnect);
-            Logger.Info("Complete create MaterialObject11");
+            CasterLogger.Debug("Complete create MaterialObject11");
         }
 
         #endregion
@@ -74,7 +74,7 @@ namespace CasterUnitCore
 
         public override void ClearAllProperties()
         {
-            Logger.Info("Material 11 ClearAllProperties");
+            CasterLogger.Debug("Material 11 ClearAllProperties");
             Debug.Assert(IsValid());
             _capeThermoMaterial.ClearAllProps();
             //_alreadyFlashed = false;
@@ -82,14 +82,14 @@ namespace CasterUnitCore
 
         public override MaterialObject Duplicate()
         {
-            Logger.Info("Duplicating");
+            CasterLogger.Debug("Duplicating");
             Debug.Assert(IsValid());
             ICapeThermoMaterial newMaterial = _capeThermoMaterial.CreateMaterial();
             object sourceMaterial = _capeThermoMaterial;
             newMaterial.CopyFromMaterial(ref sourceMaterial);
             MaterialObject11 mo = new MaterialObject11();
             mo.SetMaterial(newMaterial);
-            Logger.Info("Duplicated");
+            CasterLogger.Debug("Duplicated");
             return mo;
         }
 
@@ -100,7 +100,7 @@ namespace CasterUnitCore
 
         public override bool SetMaterial(object material)
         {
-            Logger.Info("SetMaterial");
+            CasterLogger.Debug("SetMaterial");
             if (material == null) return false;
             if (material is ICapeThermoMaterial)
             {
@@ -123,13 +123,13 @@ namespace CasterUnitCore
 
             GetListOfAllowedPhase(out string[] _, out string _2);
             UpdateCompoundList();
-            Logger.Info("SetMaterial completed");
+            CasterLogger.Debug("SetMaterial completed");
             return true;
         }
 
         protected override void Dispose(bool disposing)
         {
-            Logger.Info("Dispose material10.");
+            CasterLogger.Debug("Dispose material10.");
             if (_capeThermoMaterial != null && _capeThermoMaterial.GetType().IsCOMObject)
                 Marshal.ReleaseComObject(_capeThermoMaterial);
             if (_capeThermoCompounds != null && _capeThermoCompounds.GetType().IsCOMObject)
@@ -151,7 +151,7 @@ namespace CasterUnitCore
             _capeThermoPropertyRoutine = null;
             _capeThermoEquilibriumRoutine = null;
             _capeThermoUniversalConstant = null;
-            Logger.Info("Dispose material10 completed.");
+            CasterLogger.Debug("Dispose material10 completed.");
         }
 
         #endregion
@@ -160,13 +160,13 @@ namespace CasterUnitCore
 
         protected override bool CheckEquilibriumSpec(string[] flashSpec1, string[] flashSpec2, string solutionType)
         {
-            Logger.Info($"CheckEquilibriumSpec for {flashSpec1} and {flashSpec2}");
+            CasterLogger.Debug($"CheckEquilibriumSpec for {flashSpec1} and {flashSpec2}");
             return _capeThermoEquilibriumRoutine.CheckEquilibriumSpec(flashSpec1, flashSpec2, solutionType);
         }
 
         public override bool DoFlash(string[] flashSpec1, string[] flashSpec2, string solutionType, bool showWarning = false)
         {
-            Logger.Info($"DoFlash for {flashSpec1} and {flashSpec2} in Solution type: {solutionType}");
+            CasterLogger.Debug($"DoFlash for {flashSpec1} and {flashSpec2} in Solution type: {solutionType}");
             try
             {
                 PresentPhases = AllowedPhases;
@@ -177,11 +177,11 @@ namespace CasterUnitCore
             {
                 if (showWarning)
                     MessageBox.Show("Flash failed. " + e.Message);
-                Logger.ErrorFormatted("Flash failed. {0}", e.Message);
+                CasterLogger.ErrorFormatted("Flash failed. {0}", e.Message);
                 Debug.WriteLine("Flash failed. {0}", e.Message);
                 return false;
             }
-            Logger.Info($"Finish DoFlash");
+            CasterLogger.Debug($"Finish DoFlash");
             return true;
         }
 
@@ -241,7 +241,7 @@ namespace CasterUnitCore
 
         public override Phases[] GetListOfAllowedPhase(out string[] phaseAggregationList, out string keyCompoundId)
         {
-            Logger.Info("GetListOfAllowedPhase");
+            CasterLogger.Debug("GetListOfAllowedPhase");
             object allowedPhaseObject = null;
             object phaseAggregationObject = null;
             object keyCompoundIdObject = null;
@@ -253,7 +253,7 @@ namespace CasterUnitCore
             }
             catch (Exception e)
             {
-                Logger.ErrorFormatted("Cannot get AllowedPhase. {0}", e.Message);
+                CasterLogger.ErrorFormatted("Cannot get AllowedPhase. {0}", e.Message);
                 Debug.WriteLine("Cannot get AllowedPhase. {0}", e.Message);
             }
             if (allowedPhaseObject == null)
@@ -267,7 +267,7 @@ namespace CasterUnitCore
                                   select new Phases(phaseString)).ToArray();
 
             //Set Proper Phase name
-            Logger.Info("Material allowd phases: " + AllowedPhases);
+            CasterLogger.Debug("Material allowd phases: " + AllowedPhases);
             if (AllowedPhases.FirstOrDefault(phase => phase.Value.Contains("vap")) != null)
                 Phases.Vapor = AllowedPhases.First(phase => phase.Value.Contains("vap"));
             if (AllowedPhases.FirstOrDefault(phase => phase.Value.Contains("liq")) != null)
@@ -275,13 +275,13 @@ namespace CasterUnitCore
             if (AllowedPhases.FirstOrDefault(phase => phase.Value.Contains("solid")) != null)
                 Phases.Liquid = AllowedPhases.First(phase => phase.Value.Contains("solid"));
 
-            Logger.Info("Allowed phases: " + phaseList);
+            CasterLogger.Debug("Allowed phases: " + phaseList);
             return phaseList;
         }
 
         public override Phases[] GetListOfPresentPhases(out eCapePhaseStatus[] presentPhaseStatus)
         {
-            Logger.Info("GetListOfPresentPhases");
+            CasterLogger.Debug("GetListOfPresentPhases");
             object phaseLabel = null;
             object phaseStatus = null;
             presentPhaseStatus = null;
@@ -301,12 +301,12 @@ namespace CasterUnitCore
 
             string[] phaseStringList = phaseLabel as string[];
             Phases[] phaseList = (from phaseString in phaseStringList select new Phases(phaseString)).ToArray();
-            Logger.Info("Present phases: " + phaseList);
+            CasterLogger.Debug("Present phases: " + phaseList);
             return phaseList;
         }
         public override void SetListOfPresentPhases(IEnumerable<Phases> presentPhases, IEnumerable<eCapePhaseStatus> presentPhasesStatus)
         {
-            Logger.Info("SetListOfPresentPhases: " + presentPhases);
+            CasterLogger.Debug("SetListOfPresentPhases: " + presentPhases);
             if (_capeThermoMaterial == null) return;
             int[] phaseStatus = (from status in presentPhasesStatus select (int)status).ToArray();
             string[] phaseStringList = (from phase in presentPhases select phase.Value).ToArray();
@@ -330,7 +330,7 @@ namespace CasterUnitCore
 
         public override string[] UpdateCompoundList()
         {
-            Logger.Info("UpdateCompoundList");
+            CasterLogger.Debug("UpdateCompoundList");
             object compoundId = null, formulaId = null, names = null, boilTemps = null, molwts = null, casnos = null;
             try
             {
@@ -339,10 +339,10 @@ namespace CasterUnitCore
             }
             catch (Exception e)
             {
-                Logger.ErrorFormatted("Unable to get compound list. Make sure to call UpdateComoundList after compound list changed. {0}", e.Message);
+                CasterLogger.ErrorFormatted("Unable to get compound list. Make sure to call UpdateComoundList after compound list changed. {0}", e.Message);
                 Debug.WriteLine("Unable to get compound list. Make sure to call UpdateComoundList after compound list changed. {0}", e.Message);
             }
-            Logger.Info("Compound List: " + aliasName);
+            CasterLogger.Debug("Compound List: " + aliasName);
             return aliasName = compoundId as string[];
         }
 
@@ -352,20 +352,20 @@ namespace CasterUnitCore
 
         public override double[] GetOverallPropList(string propName, PropertyBasis basis, bool calculate = false)
         {
-            Logger.Info($"Get property {propName} for overall");
+            CasterLogger.Debug($"Get property {propName} for overall");
             object value = null;
             _capeThermoMaterial.GetOverallProp(propName, basis.ToString(), ref value);
-            Logger.Info($"Property {propName} result: {value}");
+            CasterLogger.Debug($"Property {propName} result: {value}");
             return value as double[];
         }
 
         public override void SetOverallPropList(string propName, PropertyBasis basis, IEnumerable<double> value)
         {
-            Logger.Info($"Set property {propName} for overall: {value}");
+            CasterLogger.Debug($"Set property {propName} for overall: {value}");
             double[] temp = value as double[] ?? value.ToArray();
             _capeThermoMaterial.SetOverallProp(propName, basis.ToString(), value);
             //_alreadyFlashed = false;
-            Logger.Info($"Set property complete");
+            CasterLogger.Debug($"Set property complete");
         }
 
         #endregion
@@ -379,7 +379,7 @@ namespace CasterUnitCore
 
         public override double[] GetSinglePhasePropList(string propName, Phases phase, PropertyBasis basis, bool calculate = true)
         {
-            Logger.Info($"Get property {propName} for phase {phase}");
+            CasterLogger.Debug($"Get property {propName} for phase {phase}");
             object value = null;
             if (PresentPhases.All(p => p.Value != phase.Value))
                 return new double[CompoundNum];     //default is 0 for every element
@@ -390,23 +390,23 @@ namespace CasterUnitCore
             }
             catch (Exception e)
             {
-                Logger.ErrorFormatted("Calculate single phase prop {0} fails. {1}", propName, e.Message);
+                CasterLogger.ErrorFormatted("Calculate single phase prop {0} fails. {1}", propName, e.Message);
                 Debug.WriteLine("Calculate single phase prop {0} fails. {1}", propName, e.Message);
             }
             _capeThermoMaterial.GetSinglePhaseProp(propName, phase.Value, basis.ToString(), ref value);
-            Logger.Info($"Property {propName} result: {value}");
+            CasterLogger.Debug($"Property {propName} result: {value}");
             return value as double[];
         }
 
         public override void SetSinglePhasePropList(string propName, Phases phase, PropertyBasis basis, IEnumerable<double> value)
         {
-            Logger.Info($"Set property {propName} for phase {phase}: {value}");
+            CasterLogger.Debug($"Set property {propName} for phase {phase}: {value}");
             if (PresentPhases.All(p => p.Value != phase.Value))
                 PresentPhases = AllowedPhases;
             double[] temp = value as double[] ?? value.ToArray();
             _capeThermoMaterial.SetSinglePhaseProp(propName, phase.Value, basis.ToString(), temp);
             //_alreadyFlashed = false;
-            Logger.Info($"Set property complete");
+            CasterLogger.Debug($"Set property complete");
         }
 
         #endregion
@@ -420,7 +420,7 @@ namespace CasterUnitCore
 
         public override double[] GetTwoPhasePropList(string propName, Phases phase1, Phases phase2, PropertyBasis basis, bool calculate = true)
         {
-            Logger.Info($"Get property {propName} for phase {phase1} and {phase2}");
+            CasterLogger.Debug($"Get property {propName} for phase {phase1} and {phase2}");
 
             object value = null;
 
@@ -438,13 +438,13 @@ namespace CasterUnitCore
                 Debug.WriteLine("Calculate two phase prop {0} fails. {1}", propName, e.Message);
             }
             _capeThermoMaterial.GetTwoPhaseProp(propName, phaseList, basis.ToString(), ref value);
-            Logger.Info($"Property {propName} result: {value}");
+            CasterLogger.Debug($"Property {propName} result: {value}");
             return value as double[];
         }
 
         public override void SetTwoPhasePropList(string propName, Phases phase1, Phases phase2, PropertyBasis basis, IEnumerable<double> value)
         {
-            Logger.Info($"Set property {propName} for phase {phase1} and {phase2}: {value}");
+            CasterLogger.Debug($"Set property {propName} for phase {phase1} and {phase2}: {value}");
             if (PresentPhases.All(p => p.Value != phase1.Value)
                 || PresentPhases.All(p => p.Value != phase2.Value))
                 PresentPhases = AllowedPhases;
@@ -453,7 +453,7 @@ namespace CasterUnitCore
             double[] temp = value as double[] ?? value.ToArray();
             _capeThermoMaterial.SetTwoPhaseProp(propName, phaseList, basis.ToString(), temp);
             //_alreadyFlashed = false;
-            Logger.Info($"Set property complete");
+            CasterLogger.Debug($"Set property complete");
         }
 
         #endregion
@@ -482,9 +482,9 @@ namespace CasterUnitCore
 
         public override double GetCompoundConstPropDouble(string propName, string compoundId)
         {
-            Logger.Info($"GetCompoundConstPropDouble compound {compoundId} for {propName}");
+            CasterLogger.Debug($"GetCompoundConstPropDouble compound {compoundId} for {propName}");
             object[] value = _capeThermoCompounds.GetCompoundConstant(new[] { propName }, new[] { compoundId });
-            Logger.Info("GetCompoundConstPropDouble result " + value);
+            CasterLogger.Debug("GetCompoundConstPropDouble result " + value);
             try
             {
                 return Convert.ToDouble(value.SingleOrDefault());
@@ -496,7 +496,7 @@ namespace CasterUnitCore
             }
             catch (Exception e)
             {
-                Logger.ErrorFormatted("Get compound constant prop fails. {0}", e.Message);
+                CasterLogger.ErrorFormatted("Get compound constant prop fails. {0}", e.Message);
                 Debug.WriteLine("Get compound constant prop fails. {0}", e.Message);
             }
             return 0;
@@ -504,7 +504,7 @@ namespace CasterUnitCore
 
         public override double GetCompoundTDependentProp(string propName, string compoundId, double T)
         {
-            Logger.Info($"GetCompoundTDependentProp compound {compoundId} for {propName} at temperature {T}");
+            CasterLogger.Debug($"GetCompoundTDependentProp compound {compoundId} for {propName} at temperature {T}");
             object value = null;
             _capeThermoCompounds.GetTDependentProperty(new[] { propName }, T, new[] { compoundId }, ref value);
             return (value as double[]).SingleOrDefault();
@@ -512,7 +512,7 @@ namespace CasterUnitCore
 
         public override double GetCompoundPDependentProp(string propName, string compoundId, double P)
         {
-            Logger.Info($"GetCompoundPDependentProp compound {compoundId} for {propName} at pressure {P}");
+            CasterLogger.Debug($"GetCompoundPDependentProp compound {compoundId} for {propName} at pressure {P}");
             object value = null;
             _capeThermoCompounds.GetPDependentProperty(new[] { propName }, P, new[] { compoundId }, ref value);
             return (value as double[]).SingleOrDefault();
@@ -520,7 +520,7 @@ namespace CasterUnitCore
 
         public override double GetUniversalConstProp(string constantId)
         {
-            Logger.Info($"GetUniversalConstProp for {constantId}");
+            CasterLogger.Debug($"GetUniversalConstProp for {constantId}");
             object temp = _capeThermoUniversalConstant.GetUniversalConstant(constantId);
             return Convert.ToDouble(temp);
         }

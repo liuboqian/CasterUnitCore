@@ -44,7 +44,7 @@ namespace CasterUnitCore
         /// </summary>
         public override void Connect(object objectToConnect)
         {
-            Logger.Info($"Port {this.ComponentName} is connecting");
+            CasterLogger.Debug($"Port {this.ComponentName} is connecting");
             Disconnect();
             if (objectToConnect is ICapeThermoMaterial)
             {
@@ -56,19 +56,19 @@ namespace CasterUnitCore
             }
             else
             {
-                Logger.Error("object connected to material port must be ICapeThermoMaterial or ICapeThermoMaterialObject");
+                CasterLogger.Error("object connected to material port must be ICapeThermoMaterial or ICapeThermoMaterialObject");
                 throw new ECapeUnknownException(this, "object connected to material port must be ICapeThermoMaterial or ICapeThermoMaterialObject");
             }
-            Logger.Info($"Port {this.ComponentName} connected.");
+            CasterLogger.Debug($"Port {this.ComponentName} connected.");
         }
 
         public override void Disconnect()
         {
-            Logger.Info($"Port {this.ComponentName} is disconnecting");
+            CasterLogger.Debug($"Port {this.ComponentName} is disconnecting");
             if (_materialObject!=null)
                 _materialObject.Dispose();
             _materialObject = null;
-            Logger.Info($"Port {this.ComponentName} is disconnected.");
+            CasterLogger.Debug($"Port {this.ComponentName} is disconnected.");
         }
 
         /// <summary>
