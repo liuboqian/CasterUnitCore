@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,6 +33,19 @@ namespace CasterCore
                 XmlConfigurator.Configure();
             }
             log = LogManager.GetLogger(typeof(CasterLogger));
+            AppDomain.CurrentDomain.FirstChanceException += FirstChanceException;
+            AppDomain.CurrentDomain.UnhandledException += UnhandledException;  // this method probably won't be called because the simulator will catch all errors
+        }
+
+        private static void FirstChanceException(object sender, FirstChanceExceptionEventArgs e)
+        {
+            Error($"FirstChanceException: {e.Exception.Message}");
+            Error(e.Exception.StackTrace);
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Error(e.ExceptionObject.ToString());
         }
 
         public static void Shutdown()

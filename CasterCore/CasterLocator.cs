@@ -38,9 +38,9 @@ namespace CasterCore
             {
                 if (_components[name] == component)
                     return;
-                else
-                    throw new ECapeUnknownException(
-                        $"Register Failed : Already create a different component with a same id : {name}.");
+                //else   // cofe will load component in calculation, that leads to multiple instance with same name
+                //    throw new ECapeUnknownException(
+                //        $"Register Failed : Already create a different component with a same id : {name}.");
             }
             else
                 _components.Add(name, component);
@@ -52,10 +52,10 @@ namespace CasterCore
         public static void UnRegister(string name)
         {
             CasterLogger.Debug($"UnRegister component {name}.");
-            if (!_components.ContainsKey(name))
-                throw new ECapeUnknownException(
-                    $"UnRegister Failed : Key \"{name}\" is not registered.");
-            else
+            //if (!_components.ContainsKey(name))
+            //    throw new ECapeUnknownException(
+            //        $"UnRegister Failed : Key \"{name}\" is not registered.");
+            //else
                 _components.Remove(name);
         }
 

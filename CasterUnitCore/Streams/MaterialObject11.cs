@@ -267,15 +267,15 @@ namespace CasterUnitCore
                                   select new Phases(phaseString)).ToArray();
 
             //Set Proper Phase name
-            CasterLogger.Debug("Material allowd phases: " + AllowedPhases);
-            if (AllowedPhases.FirstOrDefault(phase => phase.Value.Contains("vap")) != null)
-                Phases.Vapor = AllowedPhases.First(phase => phase.Value.Contains("vap"));
-            if (AllowedPhases.FirstOrDefault(phase => phase.Value.Contains("liq")) != null)
-                Phases.Liquid = AllowedPhases.First(phase => phase.Value.Contains("liq"));
-            if (AllowedPhases.FirstOrDefault(phase => phase.Value.Contains("solid")) != null)
-                Phases.Liquid = AllowedPhases.First(phase => phase.Value.Contains("solid"));
+            var phases = string.Join(", ", phaseList.Select(p=>p.Value).ToArray());
+            CasterLogger.Debug("Material allowd phases: " + phases);
+            if (phaseList.FirstOrDefault(phase => phase.Value.Contains("vap")) != null)
+                Phases.Vapor = phaseList.First(phase => phase.Value.Contains("vap"));
+            if (phaseList.FirstOrDefault(phase => phase.Value.Contains("liq")) != null)
+                Phases.Liquid = phaseList.First(phase => phase.Value.Contains("liq"));
+            if (phaseList.FirstOrDefault(phase => phase.Value.Contains("solid")) != null)
+                Phases.Liquid = phaseList.First(phase => phase.Value.Contains("solid"));
 
-            CasterLogger.Debug("Allowed phases: " + phaseList);
             return phaseList;
         }
 
@@ -301,12 +301,13 @@ namespace CasterUnitCore
 
             string[] phaseStringList = phaseLabel as string[];
             Phases[] phaseList = (from phaseString in phaseStringList select new Phases(phaseString)).ToArray();
-            CasterLogger.Debug("Present phases: " + phaseList);
+            var phases = string.Join(", ", phaseList.Select(p => p.Value).ToArray());
+            CasterLogger.Debug("Material present phases: " + phases);
             return phaseList;
         }
         public override void SetListOfPresentPhases(IEnumerable<Phases> presentPhases, IEnumerable<eCapePhaseStatus> presentPhasesStatus)
         {
-            CasterLogger.Debug("SetListOfPresentPhases: " + presentPhases);
+            CasterLogger.Debug("SetListOfPresentPhases: " + string.Join(", ", presentPhases.Select(p=>p.Value).ToArray()));
             if (_capeThermoMaterial == null) return;
             int[] phaseStatus = (from status in presentPhasesStatus select (int)status).ToArray();
             string[] phaseStringList = (from phase in presentPhases select phase.Value).ToArray();

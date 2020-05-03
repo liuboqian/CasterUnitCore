@@ -88,6 +88,8 @@ namespace CasterCore
             get { return _name; }
             set
             {
+                if (ComponentName == value)
+                    return;
                 if (!CanRename)
                     throw new ECapeUnknownException(this,
                         $"Rename Failed: {ComponentName} cannot be renamed.",

@@ -599,7 +599,7 @@ namespace CasterUnitCore
                 int length = pv2.Length;
                 IntPtr pcbWritten = IntPtr.Zero;
                 stream.Write(pv2, length, pcbWritten);
-                Marshal.ReleaseComObject(pStm);
+                //Marshal.ReleaseComObject(pStm);
                 if (!fClearDirty)
                     return;
                 this.Dirty = false;
@@ -608,7 +608,7 @@ namespace CasterUnitCore
             {
                 CasterLogger.Debug("Save Failed: " + ex.Message);
                 MessageBox.Show(ex.ToString());
-                Marshal.ReleaseComObject(pStm);
+                //Marshal.ReleaseComObject(pStm);
             }
             CasterLogger.Debug("Save Success");
             CasterLogger.Debug("Save");
@@ -627,12 +627,13 @@ namespace CasterUnitCore
             int cb = pv[1] * 256 + pv[0];
             byte[] numArray = new byte[cb];
             pStm.Read(numArray, cb, pcbRead);
-            Marshal.ReleaseComObject(pStm);
+            //Marshal.ReleaseComObject(pStm);
             MemoryStream memoryStream = new MemoryStream(numArray);
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            //binaryFormatter.Binder = new UBinder();
+            binaryFormatter.Binder = new UBinder();
             try
             {
+                CasterLocator.UnRegister(this);
                 object[] objArray = binaryFormatter.Deserialize(memoryStream) as object[];
                 this.ComponentName = objArray[0].ToString();
                 this.ComponentDescription = objArray[1].ToString();
@@ -646,8 +647,10 @@ namespace CasterUnitCore
                     {
                         ((CapeParameterBase)Parameters[pair.Key]).value = ((CapeParameterBase)pair.Value).value;
                     }
-                    catch
-                    { }
+                    catch (Exception e)
+                    {
+                        CasterLogger.Error(e.Message);
+                    }
                 }
                 //Results.Clear();
                 foreach (var pair in objArray[3] as CapeCollectionPair[])
@@ -657,8 +660,10 @@ namespace CasterUnitCore
                     {
                         ((CapeParameterBase)Results[pair.Key]).value = ((CapeParameterBase)pair.Value).value;
                     }
-                    catch
-                    { }
+                    catch (Exception e)
+                    {
+                        CasterLogger.Error(e.Message);
+                    }
                 }
                 //Ports.Clear();
                 foreach (var pair in objArray[4] as CapeCollectionPair[])
@@ -668,8 +673,10 @@ namespace CasterUnitCore
                     {
                         ((CapeParameterBase)Ports[pair.Key]).value = ((CapeParameterBase)pair.Value).value;
                     }
-                    catch
-                    { }
+                    catch (Exception e)
+                    {
+                        CasterLogger.Error(e.Message);
+                    }
                 }
             }
             catch (Exception ex)
