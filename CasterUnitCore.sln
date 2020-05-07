@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasterCore", "CasterCore\Ca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasterCoreTests", "CasterCoreTests\CasterCoreTests.csproj", "{833F7310-A836-4175-B4D6-335E3DBEE585}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasterUnitSampleHost", "CasterUnitSampleHost\CasterUnitSampleHost.csproj", "{7344598B-01FF-4669-A9A4-52FFE85F2BF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,18 @@ Global
 		{833F7310-A836-4175-B4D6-335E3DBEE585}.Release|x64.Build.0 = Release|x64
 		{833F7310-A836-4175-B4D6-335E3DBEE585}.Release|x86.ActiveCfg = Release|Any CPU
 		{833F7310-A836-4175-B4D6-335E3DBEE585}.Release|x86.Build.0 = Release|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Debug|x64.Build.0 = Debug|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Debug|x86.Build.0 = Debug|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Release|x64.ActiveCfg = Release|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Release|x64.Build.0 = Release|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Release|x86.ActiveCfg = Release|Any CPU
+		{7344598B-01FF-4669-A9A4-52FFE85F2BF9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
